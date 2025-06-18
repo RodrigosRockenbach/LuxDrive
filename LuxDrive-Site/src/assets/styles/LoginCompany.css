@@ -1,0 +1,39 @@
+/* Fundo azul para toda a página */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #3437C9 !important;
+  }
+  
+  /* Centraliza o conteúdo vertical e horizontalmente */
+  .login-company-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #3437C9;
+  }
+  
+  /* Estilo do container */
+  .container {
+    background-color: #F9F9F9 !important;
+    border-radius: 1rem;
+  }
+  
+  /* Botão estilizado */
+  .botaoEntrar {
+    background-color: #3437C9;
+    color: white;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .botaoEntrar:hover {
+    background-color: #2d30b2;
+  }
+  
