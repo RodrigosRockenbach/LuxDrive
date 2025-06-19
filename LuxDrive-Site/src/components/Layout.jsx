@@ -4,11 +4,13 @@ import { Outlet } from 'react-router-dom';
 
 export default function Layout() {
   return (
-    <div>
+    <>
       <Navbar />
-      <div style={{ paddingTop: '80px' }}>
-        <Outlet />
-      </div>
-    </div>
+      <main className="pt-5" style={{ paddingTop: '80px', minHeight: '100vh', backgroundColor: '#F9F9F9' }}>
+        <div className="container-fluid">
+          <Outlet />
+        </div>
+      </main>
+    </>
   );
 }

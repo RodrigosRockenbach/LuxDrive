@@ -1,14 +1,20 @@
-/* Navbar */
+/* Navbar principal */
 .lux-navbar {
   background-color: #3437C9 !important;
   color: white;
   z-index: 1050;
+  display: flex;
+  align-items: center;
+  padding-top: 0;
+  padding-bottom: 0;
+  min-height: 80px;
 }
 
 .lux-navbar .nav-link {
   color: white !important;
   font-weight: 500;
   transition: color 0.2s ease;
+  white-space: nowrap; /* Evita quebra de texto como 'Sobre nós' */
 }
 
 .lux-navbar .nav-link:hover {
@@ -21,6 +27,14 @@
 
 .lux-navbar .navbar-toggler-icon {
   background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,255,255,0.8)' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !important;
+}
+
+/* Logo ajustada */
+.logo-navbar {
+  height: 150px;
+  width: auto;
+  margin-top: -30px;
+  margin-bottom: -30px;
 }
 
 /* Sidebar overlay escuro */
@@ -65,50 +79,28 @@
   color: #3437C9;
 }
 
-.logo-navbar {
-  height: 150px; /* 3x maior do que os 50px padrão */
-  width: auto;
-}
-
-.lux-navbar {
-  background-color: #3437C9 !important;
-  color: white;
-  z-index: 1050;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-
-.lux-navbar {
-  background-color: #3437C9 !important;
-  color: white;
-  z-index: 1050;
-
-  padding-top: 0;         /* Reduz espaço acima */
-  padding-bottom: 0;      /* Reduz espaço abaixo */
-  min-height: 80px;       /* Ajuste conforme o necessário */
-  display: flex;
-  align-items: center;
-}
-
-.logo-navbar {
-  height: 150px;          /* Mantém a logo grande */
-  width: auto;
-  margin-top: -30px;      /* Opcional: sobrepõe parte superior */
-  margin-bottom: -30px;   /* Opcional: sobrepõe parte inferior */
-}
-
-.navbar-nav .nav-link.sobre-nos {
-  white-space: nowrap;
-}
-
+/* Barra de pesquisa no mobile */
 @media (max-width: 768px) {
-  .navbar form {
+  .lux-navbar form {
     margin-top: 0.5rem;
     width: 100%;
+    display: flex;
+    justify-content: center;
   }
 
-  .navbar .form-control {
+  .lux-navbar .form-control {
     font-size: 0.9rem;
     padding: 0.3rem 0.6rem;
+    width: 90%;
+    max-width: 300px;
+  }
+
+  .lux-navbar .btn.btn-light {
+    display: none;
+  }
+
+  .navbar-nav {
+    align-items: center;
+    text-align: center;
   }
 }

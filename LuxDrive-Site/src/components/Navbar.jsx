@@ -7,31 +7,32 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
 
+  const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
 
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-dark lux-navbar fixed-top">
         <div className="container-fluid px-4 d-flex align-items-center justify-content-between">
-          <Link className="navbar-brand d-flex align-items-center" to="/dashboard" onClick={closeMenu}>
-            <img src={logoBranco} alt="LuxDrive" className="logo-navbar" />
+          <Link className="navbar-brand d-flex align-items-center" to="/home" onClick={closeMenu}>
+            <img src={logoBranco} alt="LuxDrive" className="logo-navbar me-2" />
           </Link>
 
           <button
             className="navbar-toggler"
             type="button"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={toggleMenu}
             aria-controls="navbarNav"
             aria-expanded={isOpen}
             aria-label="Toggle navigation"
           >
-            <span className={`navbar-toggler-icon ${isOpen ? 'open' : ''}`}></span>
+            {isOpen ? <span>&times;</span> : <span className="navbar-toggler-icon"></span>}
           </button>
 
           <div className={`collapse navbar-collapse ${isOpen ? 'show' : ''}`} id="navbarNav">
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               <li className="nav-item">
-                <Link className="nav-link" to="/dashboard" onClick={closeMenu}>Início</Link>
+                <Link className="nav-link" to="/home" onClick={closeMenu}>Início</Link>
               </li>
               <li className="nav-item">
                 <Link className="nav-link" to="#" onClick={closeMenu}>Agendamentos</Link>
@@ -44,9 +45,9 @@ export default function Navbar() {
               </li>
             </ul>
 
-            <form className="d-flex my-2 my-lg-0 flex-grow-1 mx-2">
+            <form className="d-flex my-2 my-lg-0 w-100 w-lg-auto">
               <input
-                className="form-control form-control-sm"
+                className="form-control"
                 type="search"
                 placeholder="Buscar por lavagens..."
                 aria-label="Search"
@@ -54,7 +55,7 @@ export default function Navbar() {
             </form>
 
             <button
-              className="btn btn-light rounded-circle ms-3"
+              className="btn btn-light rounded-circle ms-3 d-none d-lg-inline"
               onClick={() => setShowSidebar(true)}
               type="button"
             >
