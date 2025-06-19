@@ -1,6 +1,40 @@
-
-.botaoEntrar{
-  width: 70% !important;
-  border-radius: 20px !important;
-  background-color: #3437C9 !important;
-}
+/* Fundo azul e centralização */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #3437C9;
+  }
+  
+  /* Wrapper geral para centralizar a tela */
+  .register-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Container principal */
+  .container {
+    max-width: 900px;
+    background-color: #F9F9F9;
+    border-radius: 1rem;
+    padding: 2rem;
+    margin: auto;
+  }
+  
+  /* Botão padrão reutilizável */
+  .botao {
+    background-color: #3437C9;
+    color: white;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    font-weight: bold;
+    border-radius: 20px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .botao:hover {
+    background-color: #2d30b2;
+  }

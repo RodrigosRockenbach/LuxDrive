@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../../firebase";
 import '../../assets/styles/RegisterUser.css';
 import logoAzul from '../../assets/images/LogoAzul.png';
 
 export default function RegisterUser() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -13,6 +15,11 @@ export default function RegisterUser() {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    document.body.classList.add('auth-page');
+    return () => document.body.classList.remove('auth-page');
+  }, []);
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -23,12 +30,24 @@ export default function RegisterUser() {
     }
 
     setIsLoading(true);
+    setError("");
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      // Cria usuário no Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Salva no Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        type: "user",
+        name: name,
+        email: email
+      });
+
       navigate("/login");
     } catch (err) {
-      setError("Erro ao criar conta. " + err.message);
+      console.error("Erro ao criar conta:", err);
+      setError("Erro ao criar conta: " + (err.message || "Tente novamente."));
     } finally {
       setIsLoading(false);
     }
@@ -36,52 +55,78 @@ export default function RegisterUser() {
 
   return (
     <div className="register-page">
-      <div className="container p-5 rounded-4 shadow-lg">
+      <div className="container shadow-lg rounded-4 overflow-hidden">
         <div className="row">
-          <div className="col-sm-6 d-flex justify-content-center align-items-center">
-            <img src={logoAzul} alt="Logo da empresa" className="img-fluid h-100" />
+          <div className="col-md-6 d-flex align-items-center justify-content-center p-4">
+            <img src={logoAzul} alt="Logo da empresa" className="imgLogo img-fluid" style={{ maxHeight: '300px' }} />
           </div>
 
-          <div className="col-sm-6">
-            <h3 className="text-center mb-4"><dt>Cadastro de Usuário</dt></h3>
+          <div className="col-md-6 p-5">
+            <h3 className="text-center mb-4 text-dark">Cadastro de Usuário</h3>
+
+            {error && <div className="alert alert-danger">{error}</div>}
 
             <form onSubmit={handleRegister}>
-              <input
-                className="bg-transparent form-control-plaintext border-bottom mb-3"
-                type="email"
-                placeholder="E-mail"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <div className="mb-4">
+                <input
+                  type="text"
+                  className="form-control border-bottom rounded-0"
+                  placeholder="Nome completo"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
 
-              <input
-                className="bg-transparent form-control-plaintext border-bottom mb-3"
-                type="password"
-                placeholder="Senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <div className="mb-4">
+                <input
+                  type="email"
+                  className="form-control border-bottom rounded-0"
+                  placeholder="E-mail"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
 
-              <input
-                className="bg-transparent form-control-plaintext border-bottom mb-4"
-                type="password"
-                placeholder="Confirmar senha"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
+              <div className="mb-4">
+                <input
+                  type="password"
+                  className="form-control border-bottom rounded-0"
+                  placeholder="Senha"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
 
-              {error && <p className="text-danger">{error}</p>}
+              <div className="mb-4">
+                <input
+                  type="password"
+                  className="form-control border-bottom rounded-0"
+                  placeholder="Confirmar senha"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </div>
 
-              <button className="botaoCadastrar mt-2 mb-3" type="submit" disabled={isLoading}>
-                {isLoading ? 'Cadastrando...' : 'Cadastrar'}
-              </button>
+              <div className="d-grid">
+                <button
+                  type="submit"
+                  className="botao"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Cadastrando...' : 'Cadastrar'}
+                </button>
+              </div>
 
-              <Link to="/login" className="d-block text-center text-decoration-none mt-3">
-                Já tem uma conta? Entrar
-              </Link>
+              <div className="text-center mt-3">
+                <span>Já tem uma conta? </span>
+                <Link to="/login" className="text-decoration-none" style={{ color: '#3437C9' }}>
+                  Entrar
+                </Link>
+              </div>
             </form>
           </div>
         </div>

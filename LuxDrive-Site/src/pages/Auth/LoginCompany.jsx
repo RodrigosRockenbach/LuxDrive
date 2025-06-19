@@ -1,6 +1,8 @@
-import { useState } from 'react';
-import { loginUser } from '../../services/authService';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { loginUser } from '../../services/authService';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../firebase';
 import '../../assets/styles/LoginCompany.css';
 import logoAzul from '../../assets/images/LogoAzul.png';
 
@@ -11,15 +13,37 @@ export default function LoginCompany() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    document.body.classList.add('auth-page');
+    return () => document.body.classList.remove('auth-page');
+  }, []);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
 
     try {
-      await loginUser(email, password);
+      const userCredential = await loginUser(email, password);
+      const user = userCredential.user;
+
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (!userDoc.exists() || userDoc.data().type !== 'company') {
+        setError('Esta conta não é de empresa.');
+        return;
+      }
+
       navigate('/dashboard');
     } catch (err) {
-      setError('Email ou senha inválidos');
+      if (
+        err.code === 'auth/invalid-credential' ||
+        err.code === 'auth/user-not-found' ||
+        err.code === 'auth/wrong-password'
+      ) {
+        setError('E-mail ou senha incorretos. Verifique e tente novamente.');
+      } else {
+        setError(err.message || 'Erro desconhecido ao fazer login.');
+      }
     } finally {
       setIsLoading(false);
     }

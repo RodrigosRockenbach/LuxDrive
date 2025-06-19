@@ -1,40 +1,40 @@
-/* Aplica fundo azul na tela toda */
+/* Fundo azul e centralização */
 html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    background-color: #3437C9 !important;
-  }
-  
-  /* Centraliza o container branco */
-  .register-page {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #3437C9;
-  }
-  
-  /* Estilo do container de formulário */
-  .container {
-    background-color: #F9F9F9 !important;
-    border-radius: 1rem;
-  }
-  
-  /* Botão de cadastro estilizado */
-  .botaoCadastrar {
-    background-color: #3437C9;
-    color: white;
-    border: none;
-    padding: 10px;
-    width: 100%;
-    font-weight: bold;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .botaoCadastrar:hover {
-    background-color: #2d30b2;
-  }
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #3437C9;
+}
 
-  
+/* Wrapper geral para centralizar a tela */
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Container principal */
+.container {
+  max-width: 900px;
+  background-color: #F9F9F9;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin: auto;
+}
+
+/* Botão padrão reutilizável */
+.botao {
+  background-color: #3437C9;
+  color: white;
+  border: none;
+  padding: 10px;
+  width: 100%;
+  font-weight: bold;
+  border-radius: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.botao:hover {
+  background-color: #2d30b2;
+}

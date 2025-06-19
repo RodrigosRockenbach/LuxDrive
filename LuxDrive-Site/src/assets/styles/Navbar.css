@@ -1,0 +1,114 @@
+/* Navbar */
+.lux-navbar {
+  background-color: #3437C9 !important;
+  color: white;
+  z-index: 1050;
+}
+
+.lux-navbar .nav-link {
+  color: white !important;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.lux-navbar .nav-link:hover {
+  color: #dcdcdc !important;
+}
+
+.lux-navbar .navbar-toggler {
+  border: none;
+}
+
+.lux-navbar .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,255,255,0.8)' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !important;
+}
+
+/* Sidebar overlay escuro */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1040;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Painel lateral */
+.sidebar {
+  background-color: #fff;
+  width: 300px;
+  height: 100%;
+  padding: 1.5rem;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  animation: slideIn 0.3s ease forwards;
+  overflow-y: auto;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+/* Itens do menu lateral */
+.sidebar-item {
+  padding: 0.8rem 0;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.sidebar-item:hover {
+  color: #3437C9;
+}
+
+.logo-navbar {
+  height: 150px; /* 3x maior do que os 50px padrão */
+  width: auto;
+}
+
+.lux-navbar {
+  background-color: #3437C9 !important;
+  color: white;
+  z-index: 1050;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.lux-navbar {
+  background-color: #3437C9 !important;
+  color: white;
+  z-index: 1050;
+
+  padding-top: 0;         /* Reduz espaço acima */
+  padding-bottom: 0;      /* Reduz espaço abaixo */
+  min-height: 80px;       /* Ajuste conforme o necessário */
+  display: flex;
+  align-items: center;
+}
+
+.logo-navbar {
+  height: 150px;          /* Mantém a logo grande */
+  width: auto;
+  margin-top: -30px;      /* Opcional: sobrepõe parte superior */
+  margin-bottom: -30px;   /* Opcional: sobrepõe parte inferior */
+}
+
+.navbar-nav .nav-link.sobre-nos {
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .navbar form {
+    margin-top: 0.5rem;
+    width: 100%;
+  }
+
+  .navbar .form-control {
+    font-size: 0.9rem;
+    padding: 0.3rem 0.6rem;
+  }
+}

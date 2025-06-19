@@ -1,10 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../firebase";
+import { registerUser } from "../../services/authService"; // Usa authService centralizado
 import "../../assets/styles/RegisterCompany.css";
 
 export default function RegisterCompany() {
+  const [step, setStep] = useState(1);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  // Dados
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [celular, setCelular] = useState("");
@@ -18,10 +23,10 @@ export default function RegisterCompany() {
   const [numero, setNumero] = useState("");
   const [bairro, setBairro] = useState("");
 
-  const [step, setStep] = useState(1);
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+  useEffect(() => {
+    document.body.classList.add("auth-page");
+    return () => document.body.classList.remove("auth-page");
+  }, []);
 
   const handleNextStep = (e) => {
     e.preventDefault();
@@ -35,6 +40,7 @@ export default function RegisterCompany() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
     if (password !== confirmPassword) {
       setError("As senhas não coincidem.");
       return;
@@ -47,11 +53,23 @@ export default function RegisterCompany() {
 
     setIsLoading(true);
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      // Futuro: salvar dados no Firestore
+      await registerUser(email, password, "company", {
+        nome,
+        telefone,
+        celular,
+        cnpj,
+        endereco: {
+          cep,
+          estado,
+          rua,
+          numero,
+          bairro,
+        },
+      });
+
       navigate("/company/login");
     } catch (err) {
-      setError("Erro ao criar conta. " + err.message);
+      setError(err.message);
     } finally {
       setIsLoading(false);
     }
@@ -65,23 +83,23 @@ export default function RegisterCompany() {
         <form onSubmit={step === 1 ? handleNextStep : handleRegister}>
           {step === 1 && (
             <>
-              <input className="bg-transparent form-control-plaintext border-bottom mb-3" type="text" placeholder="Nome da Empresa" value={nome} onChange={(e) => setNome(e.target.value)} required />
-              <input className="bg-transparent form-control-plaintext border-bottom mb-3" type="text" placeholder="CNPJ" value={cnpj} onChange={(e) => setCnpj(e.target.value)} required />
-              <input className="bg-transparent form-control-plaintext border-bottom mb-3" type="tel" placeholder="Celular" value={celular} onChange={(e) => setCelular(e.target.value)} required />
-              <input className="bg-transparent form-control-plaintext border-bottom mb-3" type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} required />
-              <input className="bg-transparent form-control-plaintext border-bottom mb-3" type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)} required />
-              <input className="bg-transparent form-control-plaintext border-bottom mb-4" type="password" placeholder="Confirmar senha" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+              <input className="form-control border-bottom mb-3" type="text" placeholder="Nome da Empresa" value={nome} onChange={(e) => setNome(e.target.value)} required />
+              <input className="form-control border-bottom mb-3" type="text" placeholder="CNPJ" value={cnpj} onChange={(e) => setCnpj(e.target.value)} required />
+              <input className="form-control border-bottom mb-3" type="tel" placeholder="Celular" value={celular} onChange={(e) => setCelular(e.target.value)} required />
+              <input className="form-control border-bottom mb-3" type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <input className="form-control border-bottom mb-3" type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <input className="form-control border-bottom mb-4" type="password" placeholder="Confirmar senha" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
             </>
           )}
 
           {step === 2 && (
             <>
               <h6 className="mb-3 fw-bold">Endereço da Empresa</h6>
-              <input className="bg-transparent form-control-plaintext border-bottom mb-3" type="text" placeholder="CEP" value={cep} onChange={(e) => setCep(e.target.value)} required />
-              <input className="bg-transparent form-control-plaintext border-bottom mb-3" type="text" placeholder="Estado" value={estado} onChange={(e) => setEstado(e.target.value)} required />
-              <input className="bg-transparent form-control-plaintext border-bottom mb-3" type="text" placeholder="Rua" value={rua} onChange={(e) => setRua(e.target.value)} required />
-              <input className="bg-transparent form-control-plaintext border-bottom mb-3" type="text" placeholder="Número" value={numero} onChange={(e) => setNumero(e.target.value)} required />
-              <input className="bg-transparent form-control-plaintext border-bottom mb-4" type="text" placeholder="Bairro" value={bairro} onChange={(e) => setBairro(e.target.value)} required />
+              <input className="form-control border-bottom mb-3" type="text" placeholder="CEP" value={cep} onChange={(e) => setCep(e.target.value)} required />
+              <input className="form-control border-bottom mb-3" type="text" placeholder="Estado" value={estado} onChange={(e) => setEstado(e.target.value)} required />
+              <input className="form-control border-bottom mb-3" type="text" placeholder="Rua" value={rua} onChange={(e) => setRua(e.target.value)} required />
+              <input className="form-control border-bottom mb-3" type="text" placeholder="Número" value={numero} onChange={(e) => setNumero(e.target.value)} required />
+              <input className="form-control border-bottom mb-4" type="text" placeholder="Bairro" value={bairro} onChange={(e) => setBairro(e.target.value)} required />
             </>
           )}
 
