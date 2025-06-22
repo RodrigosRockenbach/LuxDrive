@@ -3,12 +3,23 @@ import {
   signInWithEmailAndPassword,
   signOut
 } from 'firebase/auth';
-import { auth } from '../firebase';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase';
 
-// Função para registrar o usuário
-export const registerUser = async (email, password) => {
+// Função para registrar o usuário ou empresa
+export const registerUser = async (email, password, accountType, extraData = {}) => {
   try {
-    return await createUserWithEmailAndPassword(auth, email, password);
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    // Salvar tipo e dados adicionais no Firestore
+    await setDoc(doc(db, 'users', user.uid), {
+      type: accountType, // 'user' ou 'company'
+      email,
+      ...extraData
+    });
+
+    return userCredential;
   } catch (err) {
     if (err.code === 'auth/email-already-in-use') {
       throw new Error('Este e-mail já está em uso.');

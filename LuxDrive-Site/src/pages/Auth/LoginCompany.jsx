@@ -5,12 +5,14 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import '../../assets/styles/LoginCompany.css';
 import logoAzul from '../../assets/images/LogoAzul.png';
+import Loading from '../../components/Loading';
 
 export default function LoginCompany() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,8 +22,9 @@ export default function LoginCompany() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
+    setIsLoading(true);
+    setShowLoader(true);
 
     try {
       const userCredential = await loginUser(email, password);
@@ -35,22 +38,16 @@ export default function LoginCompany() {
 
       navigate('/dashboard');
     } catch (err) {
-      if (
-        err.code === 'auth/invalid-credential' ||
-        err.code === 'auth/user-not-found' ||
-        err.code === 'auth/wrong-password'
-      ) {
-        setError('E-mail ou senha incorretos. Verifique e tente novamente.');
-      } else {
-        setError(err.message || 'Erro desconhecido ao fazer login.');
-      }
+      setError(err.message || 'Erro desconhecido ao fazer login.');
     } finally {
       setIsLoading(false);
+      setShowLoader(false);
     }
   };
 
   return (
     <div className="login-company-page">
+      {showLoader && <Loading />}
       <div className="container p-5 rounded-4 shadow-lg">
         <div className="row">
           <div className="col-sm-6 d-flex justify-content-center align-items-center">

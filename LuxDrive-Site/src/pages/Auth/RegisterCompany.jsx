@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { registerUser } from "../../services/authService"; // Usa authService centralizado
+import { registerUser } from "../../services/authService";
 import "../../assets/styles/RegisterCompany.css";
 
 export default function RegisterCompany() {
@@ -9,7 +9,6 @@ export default function RegisterCompany() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Dados
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [celular, setCelular] = useState("");
@@ -66,7 +65,6 @@ export default function RegisterCompany() {
           bairro,
         },
       });
-
       navigate("/company/login");
     } catch (err) {
       setError(err.message);
@@ -86,6 +84,7 @@ export default function RegisterCompany() {
               <input className="form-control border-bottom mb-3" type="text" placeholder="Nome da Empresa" value={nome} onChange={(e) => setNome(e.target.value)} required />
               <input className="form-control border-bottom mb-3" type="text" placeholder="CNPJ" value={cnpj} onChange={(e) => setCnpj(e.target.value)} required />
               <input className="form-control border-bottom mb-3" type="tel" placeholder="Celular" value={celular} onChange={(e) => setCelular(e.target.value)} required />
+              <input className="form-control border-bottom mb-3" type="text" placeholder="Telefone" value={telefone} onChange={(e) => setTelefone(e.target.value)} />
               <input className="form-control border-bottom mb-3" type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} required />
               <input className="form-control border-bottom mb-3" type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)} required />
               <input className="form-control border-bottom mb-4" type="password" placeholder="Confirmar senha" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />

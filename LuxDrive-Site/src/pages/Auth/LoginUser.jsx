@@ -5,6 +5,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import '../../assets/styles/LoginUser.css';
 import logoAzul from '../../assets/images/LogoAzul.png';
+import Loading from '../../components/Loading'; // Importa o componente de carregamento
 
 export default function LoginUser() {
   const [email, setEmail] = useState('');
@@ -22,18 +23,20 @@ export default function LoginUser() {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-
+  
     try {
       const userCredential = await loginUser(email, password);
       const user = userCredential.user;
-
+  
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (!userDoc.exists() || userDoc.data().type !== 'user') {
         setError('Esta conta não é de pessoa física.');
+        setIsLoading(false);
         return;
       }
-
+  
       navigate('/home');
+      return; // <- impede re-renderização aqui
     } catch (err) {
       if (
         err.code === 'auth/invalid-credential' ||
@@ -44,10 +47,12 @@ export default function LoginUser() {
       } else {
         setError('Erro ao fazer login. Tente novamente mais tarde.');
       }
-    } finally {
       setIsLoading(false);
     }
   };
+
+  // Exibe a tela de carregamento durante a autenticação
+  if (isLoading) return <Loading />;
 
   return (
     <div className="register-page">

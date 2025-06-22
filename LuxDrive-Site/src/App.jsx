@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 
 import LoginUser from "./pages/Auth/LoginUser";
@@ -8,8 +8,21 @@ import RegisterCompany from "./pages/Auth/RegisterCompany";
 import Home from "./pages/Home";
 import Layout from "./components/Layout";
 import PrivateRoute from "./components/PrivateRoute";
+import Loading from "./components/Loading";
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
+  if (isLoading) return <Loading />;
+
   return (
     <Routes>
       <Route path="/login" element={<LoginUser />} />
@@ -17,7 +30,7 @@ function App() {
       <Route path="/company/login" element={<LoginCompany />} />
       <Route path="/company/register" element={<RegisterCompany />} />
 
-      {/* Rotas protegidas dentro do layout */}
+
       <Route element={<PrivateRoute><Layout /></PrivateRoute>}>
         <Route path="/home" element={<Home />} />
       </Route>

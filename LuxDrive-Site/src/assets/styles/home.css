@@ -1,0 +1,36 @@
+/* Geral */
+.home-page {
+    padding-bottom: 3rem;
+  }
+  
+  /* Imagens redondas e do mesmo tamanho */
+  .service-img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin: 0 auto;
+  }
+  
+  /* Carrossel para mobile */
+  .service-carousel {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+  }
+  
+  .service-carousel::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+  
+  .carousel-card {
+    flex: 0 0 auto;
+    width: 130px;
+    scroll-snap-align: start;
+    text-align: center;
+  }
+  

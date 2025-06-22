@@ -5,6 +5,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase";
 import '../../assets/styles/RegisterUser.css';
 import logoAzul from '../../assets/images/LogoAzul.png';
+import Loading from "../../components/Loading";
 
 export default function RegisterUser() {
   const [name, setName] = useState("");
@@ -33,15 +34,13 @@ export default function RegisterUser() {
     setError("");
 
     try {
-      // Cria usuário no Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Salva no Firestore
       await setDoc(doc(db, "users", user.uid), {
         type: "user",
         name: name,
-        email: email
+        email: email,
       });
 
       navigate("/login");
@@ -55,6 +54,7 @@ export default function RegisterUser() {
 
   return (
     <div className="register-page">
+      {isLoading && <Loading />}
       <div className="container shadow-lg rounded-4 overflow-hidden">
         <div className="row">
           <div className="col-md-6 d-flex align-items-center justify-content-center p-4">
