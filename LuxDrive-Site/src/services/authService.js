@@ -4,19 +4,17 @@ import {
   signOut
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { auth, db } from '../services/firebase';
 
-// Função para registrar o usuário ou empresa
 export const registerUser = async (email, password, accountType, extraData = {}) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // Salvar tipo e dados adicionais no Firestore
     await setDoc(doc(db, 'users', user.uid), {
-      type: accountType, // 'user' ou 'company'
+      type: accountType,
       email,
-      ...extraData
+      ...extraData,
     });
 
     return userCredential;
@@ -31,7 +29,6 @@ export const registerUser = async (email, password, accountType, extraData = {})
   }
 };
 
-// Função para login do usuário
 export const loginUser = async (email, password) => {
   try {
     return await signInWithEmailAndPassword(auth, email, password);
@@ -48,7 +45,6 @@ export const loginUser = async (email, password) => {
   }
 };
 
-// Função para logout do usuário
 export const logoutUser = async () => {
   try {
     await signOut(auth);

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../assets/styles/ErrorPage.css';
-import carregando from '../assets/images/carregando.png'; //mesma tela de carregando
+import '../styles/ErrorPage.css';
+import carregando from '../assets/images/carregando.png'; 
 
 export default function ErrorPage() {
   return (

@@ -1,6 +1,6 @@
 import React from 'react';
-import '../assets/styles/Loading.css';
-import carregandoImg from '../assets/images/carregando.png';
+import '../../styles/Loading.css';
+import carregandoImg from '../../assets/images/carregando.png';
 
 export default function Loading() {
   return (

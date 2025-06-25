@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { loginUser } from '../../services/authService';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../firebase';
-import '../../assets/styles/LoginUser.css';
+import { db } from '../../services/firebase';
+
+import '../../styles/LoginUser.css';
 import logoAzul from '../../assets/images/LogoAzul.png';
-import Loading from '../../components/Loading'; // Importa o componente de carregamento
+import Loading from '../../components/common/Loading';
 
 export default function LoginUser() {
   const [email, setEmail] = useState('');
@@ -23,20 +24,19 @@ export default function LoginUser() {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-  
+
     try {
       const userCredential = await loginUser(email, password);
       const user = userCredential.user;
-  
+
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (!userDoc.exists() || userDoc.data().type !== 'user') {
         setError('Esta conta não é de pessoa física.');
         setIsLoading(false);
         return;
       }
-  
+
       navigate('/home');
-      return; // <- impede re-renderização aqui
     } catch (err) {
       if (
         err.code === 'auth/invalid-credential' ||
@@ -51,7 +51,6 @@ export default function LoginUser() {
     }
   };
 
-  // Exibe a tela de carregamento durante a autenticação
   if (isLoading) return <Loading />;
 
   return (
@@ -59,7 +58,12 @@ export default function LoginUser() {
       <div className="container shadow-lg rounded-4 overflow-hidden">
         <div className="row">
           <div className="col-md-6 d-flex flex-column align-items-center justify-content-center p-5 border-end">
-            <img src={logoAzul} alt="Logo da empresa" className="imgLogo img-fluid mb-3" />
+            <img
+              src={logoAzul}
+              alt="Logo da empresa"
+              className="imgLogo img-fluid mb-3"
+              style={{ maxHeight: '300px' }}
+            />
           </div>
 
           <div className="col-md-6 p-5">

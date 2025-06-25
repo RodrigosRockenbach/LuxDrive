@@ -1,6 +1,6 @@
 import React from 'react';
-import '../assets/styles/Footer.css';
-import LogoPreto from '../assets/images/LogoPreto.png';
+import '../../styles/Footer.css';
+import LogoPreto from '../../assets/images/LogoPreto.png';
 
 export default function Footer() {
   return (

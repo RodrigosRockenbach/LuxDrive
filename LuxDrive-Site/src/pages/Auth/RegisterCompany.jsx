@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { registerUser } from "../../services/authService";
-import "../../assets/styles/RegisterCompany.css";
+import "../../styles/RegisterCompany.css";
 
 export default function RegisterCompany() {
   const [step, setStep] = useState(1);
@@ -65,9 +65,10 @@ export default function RegisterCompany() {
           bairro,
         },
       });
+
       navigate("/company/login");
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Erro ao registrar a empresa.");
     } finally {
       setIsLoading(false);
     }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import '../assets/styles/Navbar.css';
-import logoBranco from '../assets/images/LogoBranco.png';
+import '../../styles/Navbar.css';
+import logoBranco from '../../assets/images/LogoBranco.png';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,7 +35,7 @@ export default function Navbar() {
                 <Link className="nav-link" to="/home" onClick={closeMenu}>Início</Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="#" onClick={closeMenu}>Agendamentos</Link>
+                <Link className="nav-link" to="/meus-agendamentos" onClick={closeMenu}>Agendamentos</Link>
               </li>
               <li className="nav-item">
                 <Link className="nav-link" to="#" onClick={closeMenu}>Serviços</Link>

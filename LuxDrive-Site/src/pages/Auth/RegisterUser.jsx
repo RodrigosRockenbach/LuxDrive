@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { auth, db } from "../../firebase";
-import '../../assets/styles/RegisterUser.css';
+import { registerUser } from "../../services/authService";
+import '../../styles/RegisterUser.css';
 import logoAzul from '../../assets/images/LogoAzul.png';
-import Loading from "../../components/Loading";
+import Loading from "../../components/common/Loading";
 
 export default function RegisterUser() {
   const [name, setName] = useState("");
@@ -34,19 +32,15 @@ export default function RegisterUser() {
     setError("");
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      await setDoc(doc(db, "users", user.uid), {
-        type: "user",
-        name: name,
-        email: email,
+      await registerUser(email, password, "user", {
+        name,
+        email
       });
 
       navigate("/login");
     } catch (err) {
       console.error("Erro ao criar conta:", err);
-      setError("Erro ao criar conta: " + (err.message || "Tente novamente."));
+      setError(err.message || "Erro ao criar conta. Tente novamente.");
     } finally {
       setIsLoading(false);
     }
