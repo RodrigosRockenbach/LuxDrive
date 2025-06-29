@@ -1,20 +1,17 @@
-/* Fundo azul e centralização */
 html, body {
     height: 100%;
     margin: 0;
     padding: 0;
     background-color: #3437C9;
   }
-  
-  /* Wrapper geral para centralizar a tela */
+
   .register-page {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  
-  /* Container principal */
+
   .container {
     max-width: 900px;
     background-color: #F9F9F9;
@@ -23,7 +20,6 @@ html, body {
     margin: auto;
   }
   
-  /* Botão padrão reutilizável */
   .botao {
     background-color: #3437C9;
     color: white;

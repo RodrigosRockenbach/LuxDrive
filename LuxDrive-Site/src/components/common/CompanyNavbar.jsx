@@ -28,13 +28,13 @@ export default function CompanyNavbar() {
         <div className="collapse navbar-collapse d-none d-lg-flex justify-content-end">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <Link to="/home" className="nav-link">Início</Link>
+              <Link to="/dashboard" className="nav-link">Início</Link>
             </li>
             <li className="nav-item">
               <Link to="#" className="nav-link">Sobre nós</Link>
             </li>
             <li className="nav-item">
-              <Link to="/agendamentos" className="nav-link">Agenda</Link>
+              <Link to="/empresa/agendamentos" className="nav-link">Agenda</Link>
             </li>
             <li className="nav-item">
               <Link to="#" className="nav-link">Perfil</Link>
@@ -51,13 +51,13 @@ export default function CompanyNavbar() {
                 aria-label="Fechar menu"
               ></button>
               <div className="sidebar-item">
-                <Link to="/home" onClick={closeSidebar}>Início</Link>
+                <Link to="/dashboard" onClick={closeSidebar}>Início</Link>
               </div>
               <div className="sidebar-item">
                 <Link to="#" onClick={closeSidebar}>Sobre nós</Link>
               </div>
               <div className="sidebar-item">
-                <Link to="/agendamentos" onClick={closeSidebar}>Agenda</Link>
+                <Link to="/empresa/agendamentos" onClick={closeSidebar}>Agenda</Link>
               </div>
               <div className="sidebar-item">
                 <Link to="#" onClick={closeSidebar}>Perfil</Link>

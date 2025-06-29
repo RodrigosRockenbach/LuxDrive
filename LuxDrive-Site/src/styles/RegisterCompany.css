@@ -1,16 +1,13 @@
-/* Cor de fundo da página */
 html, body {
   background-color: #3437C9;
 }
 
-/* Estilo do container central */
 .register-company-page .container {
   background-color: #F9F9F9;
   border-radius: 1rem;
   max-width: 600px;
 }
 
-/* Input apenas com linha inferior */
 .form-control-plaintext {
   border: none;
   border-bottom: 2px solid #ccc;
@@ -24,7 +21,6 @@ html, body {
   border-bottom-color: #3437C9;
 }
 
-/* Botão de cadastro estilizado */
 .botaoCadastrar {
   background-color: #3437C9;
   color: white;

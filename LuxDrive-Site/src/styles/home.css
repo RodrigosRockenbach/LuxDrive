@@ -1,9 +1,7 @@
-/* Geral */
 .home-page {
     padding-bottom: 3rem;
   }
-  
-  /* Imagens redondas e do mesmo tamanho */
+
   .service-img {
     width: 120px;
     height: 120px;
@@ -11,8 +9,7 @@
     border-radius: 50%;
     margin: 0 auto;
   }
-  
-  /* Carrossel para mobile */
+
   .service-carousel {
     display: flex;
     gap: 1rem;
@@ -20,11 +17,11 @@
     padding-bottom: 1rem;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Firefox */
+    scrollbar-width: none; 
   }
   
   .service-carousel::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: none; 
   }
   
   .carousel-card {

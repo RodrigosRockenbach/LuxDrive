@@ -20,7 +20,6 @@ body {
   background-color: #F9F9F9;
 }
 
-/* Aplica fundo azul somente em páginas de login/cadastro */
 body.auth-page {
   background-color: #3437C9 !important;
 }
@@ -36,7 +35,6 @@ a:hover {
   color: #2d30b2;
 }
 
-/* Botões (aproveite Bootstrap sempre que possível) */
 button {
   font-family: inherit;
   font-weight: 500;
@@ -44,12 +42,10 @@ button {
   transition: background-color 0.2s ease-in-out;
 }
 
-/* Navbar personalizada */
 .lux-navbar {
   background-color: #3437C9 !important;
 }
 
-/* Sidebar */
 .sidebar-item:hover {
   color: #3437C9;
 }
