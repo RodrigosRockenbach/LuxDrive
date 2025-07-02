@@ -38,7 +38,7 @@ export default function Dashboard() {
           photoURL: data.photoURL || "",
         });
         setServices(data.services || []);
-        setWorkingHours(data || {});
+        setWorkingHours(data.workingHours || {});
       }
     };
     fetchCompany();
@@ -71,21 +71,21 @@ export default function Dashboard() {
   };
 
   const toggleClosedDay = async (day) => {
-    const refDoc = doc(db, "users", user.uid);
-    const updated = { ...workingHours, [day]: { fechado: true } };
-    await updateDoc(refDoc, updated);
+    const updated = {
+      ...workingHours,
+      [day]: { ...workingHours[day], fechado: true }
+    };
+    await updateDoc(doc(db, "users", user.uid), { workingHours: updated });
     setWorkingHours(updated);
     setEditingDay(null);
   };
 
   const saveWorkingHours = async (day) => {
-    const refDoc = doc(db, "users", user.uid);
-    const current = workingHours[day] || {};
     const updated = {
       ...workingHours,
-      [day]: { ...current, fechado: false, ...editingDay }
+      [day]: { ...editingDay, fechado: false }
     };
-    await updateDoc(refDoc, updated);
+    await updateDoc(doc(db, "users", user.uid), { workingHours: updated });
     setWorkingHours(updated);
     setEditingDay(null);
   };

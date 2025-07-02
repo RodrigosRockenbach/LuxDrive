@@ -37,7 +37,7 @@ export default function CompanyNavbar() {
               <Link to="/empresa/agendamentos" className="nav-link">Agenda</Link>
             </li>
             <li className="nav-item">
-              <Link to="#" className="nav-link">Perfil</Link>
+              <Link to="/empresa/perfil" className="nav-link">Perfil</Link>
             </li>
           </ul>
         </div>
@@ -60,7 +60,7 @@ export default function CompanyNavbar() {
                 <Link to="/empresa/agendamentos" onClick={closeSidebar}>Agenda</Link>
               </div>
               <div className="sidebar-item">
-                <Link to="#" onClick={closeSidebar}>Perfil</Link>
+                <Link to="/empresa/perfil" onClick={closeSidebar}>Perfil</Link>
               </div>
             </div>
           </div>

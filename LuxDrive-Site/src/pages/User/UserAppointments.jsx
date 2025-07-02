@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
-import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
+import { collection, query, where, getDocs, orderBy, doc, deleteDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../services/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Loading from "../../components/common/Loading";
+import { format, isBefore, subMinutes } from "date-fns";
 
 export default function UserAppointments() {
   const [user] = useAuthState(auth);
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -16,11 +18,11 @@ export default function UserAppointments() {
       try {
         const q = query(
           collection(db, "appointments"),
-          where("userId", "==", user.uid),
-          orderBy("start", "asc")
+          where("clientId", "==", user.uid),
+          orderBy("date", "asc")
         );
-        const querySnapshot = await getDocs(q);
-        const data = querySnapshot.docs.map(doc => ({
+        const snapshot = await getDocs(q);
+        const data = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
         }));
@@ -35,28 +37,59 @@ export default function UserAppointments() {
     fetchAppointments();
   }, [user]);
 
-  if (loading) return <Loading />;
-
   const now = new Date();
-  const upcoming = appointments.find(app => new Date(app.start.toDate()) > now);
-  const pastAppointments = appointments
-    .filter(app => new Date(app.start.toDate()) <= now)
-    .reverse();
+  const upcoming = appointments.filter(app => new Date(app.date) > now);
+  const pastAppointments = appointments.filter(app => new Date(app.date) <= now).reverse();
+
+  const cancelAppointment = async (appointment) => {
+    const startTime = new Date(appointment.date);
+    const cancelDeadline = subMinutes(startTime, 30);
+
+    if (isBefore(now, cancelDeadline)) {
+      await deleteDoc(doc(db, "appointments", appointment.id));
+
+      const companyRef = doc(db, "users", appointment.companyId);
+      const companySnap = await getDoc(companyRef);
+      const companyEmail = companySnap.exists() ? companySnap.data().email : "empresa@example.com";
+
+      // Simule envio de e-mail
+      console.log(`E-mail enviado para ${companyEmail}: o cliente ${appointment.clientName} cancelou o serviço.`);
+
+      setAppointments(prev => prev.filter(a => a.id !== appointment.id));
+      setMessage("Agendamento cancelado com sucesso.");
+    } else {
+      setMessage("Cancelamento permitido apenas até 30 minutos antes do horário marcado.");
+    }
+  };
+
+  if (loading) return <Loading />;
 
   return (
     <div className="container mt-5 pt-5">
-      <h4 className="mb-4 fw-bold">Agendamentos</h4>
+      <h4 className="mb-4 fw-bold">Meus Agendamentos</h4>
+
+      {message && <div className="alert alert-info">{message}</div>}
 
       <section className="mb-5">
-        <h6 className="fw-bold">Próximo Serviço</h6>
-        {upcoming ? (
-          <div className="border rounded p-3 bg-white shadow-sm">
-            <p><strong>Data:</strong> {new Date(upcoming.start.toDate()).toLocaleDateString()}</p>
-            <p><strong>Horário:</strong> {new Date(upcoming.start.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-            <p><strong>Empresa:</strong> {upcoming.companyName}</p>
-            <p><strong>Tipo de serviço:</strong> {upcoming.serviceType}</p>
-            <p><strong>Valor:</strong> R$ {upcoming.price}</p>
-            <p><strong>Forma de pagamento:</strong> {upcoming.paymentMethod}</p>
+        <h6 className="fw-bold">Próximos Serviços</h6>
+        {upcoming.length > 0 ? (
+          <div className="row g-3">
+            {upcoming.map(app => (
+              <div key={app.id} className="col-md-4">
+                <div className="border rounded p-3 bg-white shadow-sm h-100">
+                  <p><strong>Data:</strong> {format(new Date(app.date), "dd/MM/yyyy")}</p>
+                  <p><strong>Horário:</strong> {format(new Date(app.date), "HH:mm")}</p>
+                  <p><strong>Empresa:</strong> {app.companyName}</p>
+                  <p><strong>Serviço:</strong> {app.serviceName}</p>
+                  <p><strong>Duração:</strong> {app.estimatedTime}h</p>
+                  {isBefore(now, subMinutes(new Date(app.date), 30)) && (
+                    <button className="btn btn-danger mt-2 w-100" onClick={() => cancelAppointment(app)}>
+                      Cancelar Agendamento
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <p className="text-muted">Nenhum serviço futuro agendado.</p>
@@ -64,18 +97,17 @@ export default function UserAppointments() {
       </section>
 
       <section>
-        <h6 className="fw-bold">Serviços anteriores</h6>
+        <h6 className="fw-bold">Serviços Anteriores</h6>
         {pastAppointments.length > 0 ? (
-          <div className="row g-4">
+          <div className="row g-3">
             {pastAppointments.map(app => (
-              <div key={app.id} className="col-md-6">
-                <div className="border rounded p-3 bg-white shadow-sm">
-                  <p><strong>Data:</strong> {new Date(app.start.toDate()).toLocaleDateString()}</p>
-                  <p><strong>Horário:</strong> {new Date(app.start.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+              <div key={app.id} className="col-md-4">
+                <div className="border rounded p-3 bg-white shadow-sm h-100">
+                  <p><strong>Data:</strong> {format(new Date(app.date), "dd/MM/yyyy")}</p>
+                  <p><strong>Horário:</strong> {format(new Date(app.date), "HH:mm")}</p>
                   <p><strong>Empresa:</strong> {app.companyName}</p>
-                  <p><strong>Tipo de serviço:</strong> {app.serviceType}</p>
-                  <p><strong>Valor:</strong> R$ {app.price}</p>
-                  <p><strong>Forma de pagamento:</strong> {app.paymentMethod}</p>
+                  <p><strong>Serviço:</strong> {app.serviceName}</p>
+                  <p><strong>Duração:</strong> {app.estimatedTime}h</p>
                 </div>
               </div>
             ))}

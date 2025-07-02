@@ -1,11 +1,49 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { auth, db } from '../../services/firebase';
+import { signOut } from 'firebase/auth';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { doc, getDoc } from 'firebase/firestore';
+
 import '../../styles/Navbar.css';
 import logoBranco from '../../assets/images/LogoBranco.png';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [user] = useAuthState(auth);
+  const [userName, setUserName] = useState('Seu Nome');
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      if (user) {
+        const ref = doc(db, "users", user.uid);
+        const snapshot = await getDoc(ref);
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          setUserName(data.name || "Usuário");
+        }
+      }
+    };
+    fetchUserName();
+  }, [user]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchTerm.trim() !== '') {
+      navigate(`/home?q=${encodeURIComponent(searchTerm.trim())}`);
+      setSearchTerm('');
+      setIsOpen(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    navigate('/login');
+  };
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
@@ -38,19 +76,18 @@ export default function Navbar() {
                 <Link className="nav-link" to="/meus-agendamentos" onClick={closeMenu}>Agendamentos</Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="#" onClick={closeMenu}>Serviços</Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="#" onClick={closeMenu}>Sobre nós</Link>
+                <Link className="nav-link" to="/erro" onClick={closeMenu}>Sobre nós</Link>
               </li>
             </ul>
 
-            <form className="d-flex my-2 my-lg-0 w-100 w-lg-auto">
+            <form className="d-flex my-2 my-lg-0 w-100 w-lg-auto" onSubmit={handleSearch}>
               <input
                 className="form-control"
                 type="search"
                 placeholder="Buscar por lavagens..."
                 aria-label="Search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </form>
 
@@ -72,24 +109,33 @@ export default function Navbar() {
             <div className="sidebar-header d-flex justify-content-between align-items-center">
               <div className="text-center w-100">
                 <div className="rounded-circle bg-secondary mx-auto mb-2" style={{ width: '70px', height: '70px' }}></div>
-                <strong>Seu Nome</strong>
+                <strong>{userName}</strong>
               </div>
               <button className="btn-close ms-auto" onClick={() => setShowSidebar(false)}></button>
             </div>
 
             <ul className="list-group list-group-flush mt-3">
-              <li className="list-group-item sidebar-item">Perfil</li>
-              <li className="list-group-item sidebar-item">Agendamentos</li>
-              <li className="list-group-item sidebar-item">Serviços</li>
-              <li className="list-group-item sidebar-item">Dados cadastro</li>
-              <li className="list-group-item sidebar-item">Cartões</li>
-              <li className="list-group-item sidebar-item">Trabalhe Conosco</li>
+              <li className="list-group-item sidebar-item">
+                <Link to="/home" onClick={() => setShowSidebar(false)}>Início</Link>
+              </li>
+              <li className="list-group-item sidebar-item">
+                <Link to="/meus-agendamentos" onClick={() => setShowSidebar(false)}>Agendamentos</Link>
+              </li>
+              <li className="list-group-item sidebar-item">
+                <Link to="/perfil" onClick={() => setShowSidebar(false)}>Perfil</Link>
+              </li>
+              <li className="list-group-item sidebar-item">
+                <Link to="/erro" onClick={() => setShowSidebar(false)}>Sobre nós</Link>
+              </li>
+              <li className="list-group-item sidebar-item">
+                <Link to="/company/register" onClick={() => setShowSidebar(false)}>Trabalhe Conosco</Link>
+              </li>
+              <li className="list-group-item sidebar-item text-danger" onClick={handleLogout} style={{ cursor: 'pointer' }}>
+                Sair
+              </li>
             </ul>
 
-            <div className="text-center mt-4 small">
-              <div className="text-danger">Sair</div>
-              <div className="text-muted">Versão 0.1</div>
-            </div>
+            <div className="text-center mt-4 small text-muted">Versão 0.1</div>
           </div>
         </div>
       )}

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
+import "react-datepicker/dist/react-datepicker.css";
 
 import LoginUser from "./pages/Auth/LoginUser";
 import RegisterUser from "./pages/Auth/RegisterUser";
@@ -9,10 +10,12 @@ import RegisterCompany from "./pages/Auth/RegisterCompany";
 import Home from "./pages/User/home";
 import Schedule from "./pages/User/Schedule";
 import AppointmentsUser from "./pages/User/UserAppointments";
+import UserProfile from "./pages/User/UserProfile";
 import CompanyProfile from "./pages/CompanyProfile";
 
 import Dashboard from "./pages/Company/Dashboard";
 import CompanyAppointments from "./pages/Company/CompanyAppointments";
+import PerfilCompany from "./pages/Company/PerfilCompany";
 
 import UserLayout from "./layouts/UserLayout";
 import CompanyLayout from "./layouts/CompanyLayout";
@@ -40,19 +43,34 @@ function App() {
       <Route path="/company/register" element={<RegisterCompany />} />
 
       {/* Rotas protegidas - usuário */}
-      <Route element={<PrivateRoute><UserLayout /></PrivateRoute>}>
+      <Route
+        element={
+          <PrivateRoute requiredType="user">
+            <UserLayout />
+          </PrivateRoute>
+        }
+      >
         <Route path="/home" element={<Home />} />
         <Route path="/agendar" element={<Schedule />} />
         <Route path="/meus-agendamentos" element={<AppointmentsUser />} />
-        <Route path="/empresa/:id" element={<CompanyProfile />} /> {/* Agora protegida */}
+        <Route path="/empresa/:id" element={<CompanyProfile />} />
+        <Route path="/perfil" element={<UserProfile />} />
       </Route>
 
       {/* Rotas protegidas - empresa */}
-      <Route element={<PrivateRoute><CompanyLayout /></PrivateRoute>}>
+      <Route
+        element={
+          <PrivateRoute requiredType="company">
+            <CompanyLayout />
+          </PrivateRoute>
+        }
+      >
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/empresa/agendamentos" element={<CompanyAppointments />} />
+        <Route path="/empresa/perfil" element={<PerfilCompany />} />
       </Route>
 
+      {/* Página de erro */}
       <Route path="*" element={<ErrorPage />} />
     </Routes>
   );
