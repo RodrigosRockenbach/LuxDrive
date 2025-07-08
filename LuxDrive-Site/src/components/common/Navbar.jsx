@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { auth, db } from '../../services/firebase';
 import { signOut } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { doc, getDoc } from 'firebase/firestore';
+import { FaBars } from 'react-icons/fa';
 
 import '../../styles/Navbar.css';
 import logoBranco from '../../assets/images/LogoBranco.png';
+import perfilImage from '../../assets/images/perfilImage.png';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,24 +16,27 @@ export default function Navbar() {
   const [searchTerm, setSearchTerm] = useState('');
   const [user] = useAuthState(auth);
   const [userName, setUserName] = useState('Seu Nome');
+  const [userPhoto, setUserPhoto] = useState(null);
 
   const navigate = useNavigate();
 
+  // Busca nome e foto do usuário no Firestore
   useEffect(() => {
-    const fetchUserName = async () => {
+    const fetchUserData = async () => {
       if (user) {
-        const ref = doc(db, "users", user.uid);
-        const snapshot = await getDoc(ref);
-        if (snapshot.exists()) {
-          const data = snapshot.data();
-          setUserName(data.name || "Usuário");
+        const ref = doc(db, 'users', user.uid);
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          const data = snap.data();
+          setUserName(data.name || 'Usuário');
+          setUserPhoto(data.photoURL || null);
         }
       }
     };
-    fetchUserName();
+    fetchUserData();
   }, [user]);
 
-  const handleSearch = (e) => {
+  const handleSearch = e => {
     e.preventDefault();
     if (searchTerm.trim() !== '') {
       navigate(`/home?q=${encodeURIComponent(searchTerm.trim())}`);
@@ -87,16 +92,16 @@ export default function Navbar() {
                 placeholder="Buscar por lavagens..."
                 aria-label="Search"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
               />
             </form>
 
             <button
-              className="btn btn-light rounded-circle ms-3 d-none d-lg-inline"
+              className="btn btn-brand-circle rounded-circle ms-3 d-none d-lg-inline"
               onClick={() => setShowSidebar(true)}
               type="button"
             >
-              <i className="bi bi-person"></i>
+              <FaBars className="icon-light-bars" size={26}  />
             </button>
           </div>
         </div>
@@ -105,13 +110,21 @@ export default function Navbar() {
       {/* Sidebar */}
       {showSidebar && (
         <div className="sidebar-overlay" onClick={() => setShowSidebar(false)}>
-          <div className="sidebar" onClick={(e) => e.stopPropagation()}>
-            <div className="sidebar-header d-flex justify-content-between align-items-center">
-              <div className="text-center w-100">
-                <div className="rounded-circle bg-secondary mx-auto mb-2" style={{ width: '70px', height: '70px' }}></div>
-                <strong>{userName}</strong>
-              </div>
-              <button className="btn-close ms-auto" onClick={() => setShowSidebar(false)}></button>
+          <div className="sidebar" onClick={e => e.stopPropagation()}>
+            <div className="sidebar-header position-relative d-flex flex-column align-items-center p-4" style={{ minHeight: '150px' }}>
+              <button
+                className="btn-close position-absolute top-0 end-0 m-2"
+                onClick={() => setShowSidebar(false)}
+              />
+
+              <img
+                src={userPhoto || perfilImage}
+                alt="Foto de perfil"
+                className="rounded-circle mb-3"
+                style={{ width: '80px', height: '80px', objectFit: 'cover' }}
+              />
+
+              <strong>{userName}</strong>
             </div>
 
             <ul className="list-group list-group-flush mt-3">

@@ -98,3 +98,40 @@
     text-align: center;
   }
 }
+/* Ícone de usuário na navbar (botão) */
+.user-icon-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+}
+
+/* Avatar no sidebar */
+.sidebar-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Placeholder, caso não haja foto */
+.sidebar-avatar-placeholder {
+  color: #6c757d;
+}
+
+/* Header do sidebar ajustado */
+.sidebar-header {
+  position: relative;
+  padding-top: 1rem;
+  padding-bottom: 0.5rem;
+}
+
+/* botão circular com fundo azul */
+.btn-brand-circle {
+  background-color: #3437C9;
+  border-color:   #3437C9;
+}
+
+/* ícone de “barrinhas” em off-white */
+.icon-light-bars {
+  color: #f9f9f9 !important;
+}

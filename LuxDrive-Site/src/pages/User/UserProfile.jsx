@@ -1,223 +1,201 @@
-import { useEffect, useState } from "react";
-import { auth, db, storage } from "../../services/firebase";
-import { useAuthState } from "react-firebase-hooks/auth";
-import {
-  doc,
-  getDoc,
-  updateDoc
-} from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import "../../styles/UserProfile.css";
+
+import React, { useState, useEffect, useRef } from 'react';
+import { auth, db, storage } from '../../services/firebase';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import axios from 'axios';
+import '../../styles/UserProfile.css';
+import perfilImage from '../../assets/images/perfilImage.png';
+import { FaPaperclip } from 'react-icons/fa';
 
 export default function UserProfile() {
   const [user] = useAuthState(auth);
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    cep: "",
-    rua: "",
-    numero: "",
-    bairro: "",
-    cidade: "",
-    estado: "",
-    photoURL: ""
+    name: '',
+    email: '',
+    cep: '',
+    rua: '',
+    numero: '',
+    bairro: '',
+    cidade: '',
+    estado: '',
+    photoURL: '',
   });
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [isSaving, setIsSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newPhotoFile, setNewPhotoFile] = useState(null);
+  const fileInputRef = useRef();
 
   useEffect(() => {
-    const loadData = async () => {
-      if (!user) return;
-
-      const docRef = doc(db, "users", user.uid);
-      const snapshot = await getDoc(docRef);
-      if (snapshot.exists()) {
-        setFormData(prev => ({
-          ...prev,
-          ...snapshot.data()
-        }));
-      }
-    };
-
-    loadData();
+    if (user) {
+      (async () => {
+        const ref = doc(db, 'users', user.uid);
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          const data = snap.data();
+          setFormData(prev => ({ ...prev, ...data }));
+        }
+      })();
+    }
   }, [user]);
 
-  const handleChange = (e) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
+  useEffect(() => {
+    return () => {
+      if (formData.photoURL?.startsWith('blob:')) {
+        URL.revokeObjectURL(formData.photoURL);
+      }
+    };
+  }, [formData.photoURL]);
+
+  const handleChange = e => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleCEP = async () => {
-    if (formData.cep.length !== 8) return;
-
-    try {
-      const res = await fetch(`https://viacep.com.br/ws/${formData.cep}/json/`);
-      const data = await res.json();
-
-      if (!data.erro) {
-        setFormData(prev => ({
-          ...prev,
-          rua: data.logradouro || "",
-          bairro: data.bairro || "",
-          cidade: data.localidade || "",
-          estado: data.uf || ""
-        }));
+  const handleCepBlur = async () => {
+    const cep = formData.cep.replace(/\D/g, '');
+    if (cep.length === 8) {
+      try {
+        const res = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+        if (!res.data.erro) {
+          setFormData(prev => ({
+            ...prev,
+            rua: res.data.logradouro,
+            bairro: res.data.bairro,
+            cidade: res.data.localidade,
+            estado: res.data.uf,
+          }));
+        }
+      } catch (err) {
+        console.error('Erro ao buscar CEP:', err);
       }
-    } catch (err) {
-      console.error("Erro ao buscar CEP", err);
     }
   };
 
-  const handleImageChange = (e) => {
+  const handleFileChange = e => {
     if (e.target.files[0]) {
-      setSelectedImage(e.target.files[0]);
+      const file = e.target.files[0];
+      setNewPhotoFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setFormData(prev => ({ ...prev, photoURL: previewUrl }));
     }
   };
 
   const handleSave = async () => {
-    setIsSaving(true);
+    if (!user) return;
 
-    let photoURL = formData.photoURL;
+    console.log("Usuário autenticado:", user?.uid); // 🧪 Verificação do UID
 
-    // Se for adicionada uma nova imagem, faz o upload
-    if (selectedImage) {
-      const imageRef = ref(storage, `profileImages/${user.uid}`);
-      await uploadBytes(imageRef, selectedImage);
-      photoURL = await getDownloadURL(imageRef);
+    const ref = doc(db, 'users', user.uid);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      alert('Usuário não encontrado no banco de dados.');
+      return;
     }
 
-    const updatedData = {
-      ...formData,
-      photoURL
+    const updates = {
+      cep: formData.cep,
+      rua: formData.rua,
+      numero: formData.numero,
+      bairro: formData.bairro,
+      cidade: formData.cidade,
+      estado: formData.estado,
     };
 
-    const docRef = doc(db, "users", user.uid);
-    await updateDoc(docRef, updatedData);
+    if (newPhotoFile) {
+      const fileRef = storageRef(storage, `profileImages/${user.uid}`);
+      const task = uploadBytesResumable(fileRef, newPhotoFile);
+      await new Promise((res, rej) => task.on('state_changed', null, rej, res));
+      const url = await getDownloadURL(fileRef);
+      updates.photoURL = url;
+      setFormData(prev => ({ ...prev, photoURL: url }));
+      setNewPhotoFile(null);
+    }
 
-    setIsSaving(false);
-    alert("Dados atualizados com sucesso!");
+    await updateDoc(ref, updates);
+    setIsEditing(false);
   };
 
   return (
-    <div className="container mt-5 pt-4">
-      <h3 className="mb-4 fw-bold">Perfil do Usuário</h3>
+    <div className="container">
+      <h4 className="text-center my-4">Perfil de {formData.name}</h4>
 
-      <div className="text-center mb-4">
-        <div className="position-relative d-inline-block">
-          <img
-            src={
-              selectedImage
-                ? URL.createObjectURL(selectedImage)
-                : formData.photoURL || "https://via.placeholder.com/120"
-            }
-            className="rounded-circle profile-img"
-            alt="Perfil"
-          />
-          <label className="edit-icon">
-            <i className="bi bi-pencil-square"></i>
-            <input type="file" hidden accept="image/*" onChange={handleImageChange} />
-          </label>
-        </div>
+      <div className="d-flex justify-content-center my-3">
+        <img
+          src={formData.photoURL || perfilImage}
+          alt="Foto de Perfil"
+          className="rounded-circle profile-image"
+        />
       </div>
 
-      <div className="row g-3">
-        <div className="col-md-6">
-          <label className="form-label">Nome completo</label>
-          <input
-            type="text"
-            className="form-control"
-            name="name"
-            value={formData.name || ""}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="col-md-6">
-          <label className="form-label">Email</label>
-          <input
-            type="email"
-            className="form-control"
-            value={formData.email || ""}
-            disabled
-          />
-        </div>
-
-        <div className="col-md-3">
-          <label className="form-label">CEP</label>
-          <input
-            type="text"
-            className="form-control"
-            name="cep"
-            value={formData.cep || ""}
-            onChange={handleChange}
-            onBlur={handleCEP}
-            maxLength={8}
-          />
-        </div>
-
-        <div className="col-md-5">
-          <label className="form-label">Rua</label>
-          <input
-            type="text"
-            className="form-control"
-            name="rua"
-            value={formData.rua || ""}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="col-md-2">
-          <label className="form-label">Número</label>
-          <input
-            type="text"
-            className="form-control"
-            name="numero"
-            value={formData.numero || ""}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="col-md-4">
-          <label className="form-label">Bairro</label>
-          <input
-            type="text"
-            className="form-control"
-            name="bairro"
-            value={formData.bairro || ""}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="col-md-4">
-          <label className="form-label">Cidade</label>
-          <input
-            type="text"
-            className="form-control"
-            name="cidade"
-            value={formData.cidade || ""}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="col-md-4">
-          <label className="form-label">Estado</label>
-          <input
-            type="text"
-            className="form-control"
-            name="estado"
-            value={formData.estado || ""}
-            onChange={handleChange}
-          />
-        </div>
-      </div>
-
-      <div className="d-grid mt-4">
-        <button className="btn btn-primary" onClick={handleSave} disabled={isSaving}>
-          {isSaving ? "Salvando..." : "Salvar Alterações"}
+      <div className="d-flex justify-content-center mb-3">
+        <button
+          className="btn btn-outline-secondary"
+          onClick={() => fileInputRef.current.click()}
+          disabled={!isEditing}
+        >
+          <FaPaperclip />
         </button>
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          className="file-input"
+          onChange={handleFileChange}
+          disabled={!isEditing}
+        />
       </div>
+
+      <form>
+        <div className="mb-3">
+          <label className="form-label">Nome</label>
+          <input type="text" className="form-control" value={formData.name} disabled />
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Email</label>
+          <input type="email" className="form-control" value={formData.email} disabled />
+        </div>
+
+        <h5>Endereço</h5>
+        {['cep', 'rua', 'numero', 'bairro', 'cidade', 'estado'].map(field => (
+          <div className="mb-3" key={field}>
+            <label className="form-label">
+              {field.charAt(0).toUpperCase() + field.slice(1)}
+            </label>
+            <input
+              type="text"
+              name={field}
+              className="form-control"
+              value={formData[field]}
+              onChange={handleChange}
+              onBlur={field === 'cep' ? handleCepBlur : undefined}
+              disabled={!isEditing}
+            />
+          </div>
+        ))}
+
+        <div className="d-flex justify-content-end">
+          {!isEditing ? (
+            <button type="button" className="btn btn-primary" onClick={() => setIsEditing(true)}>
+              Editar
+            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="btn btn-secondary me-2"
+                onClick={() => setIsEditing(false)}
+              >
+                Cancelar
+              </button>
+              <button type="button" className="btn btn-success" onClick={handleSave}>
+                Salvar
+              </button>
+            </>
+          )}
+        </div>
+      </form>
     </div>
   );
 }
