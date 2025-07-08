@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
 
 import LoginUser from "./pages/Auth/LoginUser";
@@ -36,6 +36,9 @@ function App() {
 
   return (
     <Routes>
+      {/* Rota raiz redireciona para login */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
+
       {/* Rotas públicas */}
       <Route path="/login" element={<LoginUser />} />
       <Route path="/cadastro" element={<RegisterUser />} />
