@@ -1,8 +1,10 @@
-import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../services/firebase";
-import ScheduleModal from "../components/scheduling/ScheduleModal";
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../services/firebase';
+import ScheduleModal from '../components/scheduling/ScheduleModal';
+import { FaInstagram, FaFacebook } from 'react-icons/fa';
+import perfilImage from '../assets/images/perfilImage.png';
 
 export default function CompanyProfile() {
   const { id } = useParams();
@@ -11,34 +13,98 @@ export default function CompanyProfile() {
 
   useEffect(() => {
     const fetchCompany = async () => {
-      const ref = doc(db, "users", id);
-      const snapshot = await getDoc(ref);
-      if (snapshot.exists()) {
-        setCompany(snapshot.data());
+      try {
+        const refDoc = doc(db, 'users', id);
+        const snapshot = await getDoc(refDoc);
+        if (snapshot.exists()) {
+          setCompany(snapshot.data());
+        }
+      } catch (error) {
+        console.error('Erro ao buscar empresa:', error);
       }
     };
     fetchCompany();
   }, [id]);
 
-  if (!company) return <div className="text-center mt-5">Carregando...</div>;
+  if (!company) {
+    return <div className="text-center mt-5">Carregando...</div>;
+  }
+
+  const {
+    photoURL,
+    nome,
+    description,
+    endereco,
+    instagram,
+    facebook,
+    services = []
+  } = company;
+
+  const instagramLink = instagram
+    ? instagram.startsWith('http')
+      ? instagram
+      : `https://instagram.com/${instagram.replace(/^@/, '')}`
+    : null;
+  const facebookLink = facebook
+    ? facebook.startsWith('http')
+      ? facebook
+      : `https://facebook.com/${facebook.replace(/^@/, '')}`
+    : null;
 
   return (
-    <div className="container mt-5 pt-5">
-      <h2 className="fw-bold">{company.name}</h2>
-      <p>{company.description}</p>
+    <div className="company-profile container mt-5 pt-5">
+      <div className="text-center mb-5">
+        <img
+          src={photoURL || perfilImage}
+          alt="Logo da empresa"
+          className="rounded-circle mb-3"
+          style={{ width: '120px', height: '120px', objectFit: 'cover' }}
+        />
+        <h2 className="fw-bold">{nome}</h2>
+        {description && <p className="text-muted">{description}</p>}
+        {endereco?.rua && endereco?.numero && (
+          <p className="mb-1">
+            {endereco.rua}, {endereco.numero} - {endereco.bairro}
+          </p>
+        )}
+        {endereco?.cidade && endereco?.estado && (
+          <p className="mb-3">
+            {endereco.cidade}/{endereco.estado}
+          </p>
+        )}
+        <div className="d-flex justify-content-center gap-4">
+          {instagramLink && (
+            <a href={instagramLink} target="_blank" rel="noopener noreferrer" className="text-decoration-none">
+              <FaInstagram size={24} />
+            </a>
+          )}
+          {facebookLink && (
+            <a href={facebookLink} target="_blank" rel="noopener noreferrer" className="text-decoration-none">
+              <FaFacebook size={24} />
+            </a>
+          )}
+        </div>
+      </div>
+
       <hr />
-      <h4>Serviços oferecidos:</h4>
+
+      <h4 className="fw-bold mb-4">Serviços oferecidos</h4>
       <div className="row g-4">
-        {company.services?.map((s, i) => (
+        {services.map((s, i) => (
           <div key={i} className="col-md-4">
             <div className="border p-3 rounded bg-white shadow-sm h-100 d-flex flex-column justify-content-between">
               <div>
                 <h6 className="fw-bold">{s.name}</h6>
-                <p>{s.description}</p>
-                <p><strong>Valor:</strong> R$ {s.price}</p>
-                <p><strong>Tempo Estimado:</strong> {s.estimatedTime}</p>
+                {s.description && <p>{s.description}</p>}
+                <p>
+                  <strong>Valor:</strong> R${' '}
+                  {parseFloat(s.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </p>
+                <p>
+                  <strong>Tempo Estimado:</strong> {s.estimatedTime}
+                </p>
               </div>
-              <button className="btn btn-primary mt-2" onClick={() => setSelectedService(s)}>
+              <button className="btn btn-primary mt-3" onClick={() => setSelectedService(s)}>
                 Agendar
               </button>
             </div>

@@ -1,38 +1,37 @@
-import { useEffect, useState } from "react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { db, auth } from "../../services/firebase";
+import React, { useEffect, useState } from 'react';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { db, auth } from '../../services/firebase';
+import axios from 'axios';
+import { Spinner } from 'react-bootstrap';
 
 export default function PerfilCompany() {
   const [user] = useAuthState(auth);
-  const [data, setData] = useState(null);
   const [form, setForm] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [successMsg, setSuccessMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState('');
+  const [buscando, setBuscando] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       if (!user) return;
-      const ref = doc(db, "users", user.uid);
-      const snapshot = await getDoc(ref);
+      const refDoc = doc(db, 'users', user.uid);
+      const snapshot = await getDoc(refDoc);
       if (snapshot.exists()) {
-        const userData = snapshot.data();
-        setData(userData);
+        const data = snapshot.data();
         setForm({
-          nome: userData.nome || "",
-          name: userData.name || "",
-          email: userData.email || "",
-          celular: userData.celular || "",
-          instagram: userData.instagram || "",
-          whatsapp: userData.whatsapp || "",
-          facebook: userData.facebook || "",
+          ownerName: data.ownerName || '',
+          companyName: data.nome || data.name || '',
+          instagram: data.instagram || '',
+          whatsapp: data.whatsapp || '',
+          facebook: data.facebook || '',
           endereco: {
-            rua: userData.endereco?.rua || "",
-            numero: userData.endereco?.numero || "",
-            bairro: userData.endereco?.bairro || "",
-            cidade: userData.endereco?.cidade || "",
-            estado: userData.endereco?.estado || "",
-            cep: userData.endereco?.cep || "",
+            cep: data.endereco?.cep || '',
+            rua: data.endereco?.rua || '',
+            numero: data.endereco?.numero || '',
+            bairro: data.endereco?.bairro || '',
+            cidade: data.endereco?.cidade || '',
+            estado: data.endereco?.estado || '',
           },
         });
       }
@@ -42,8 +41,8 @@ export default function PerfilCompany() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name.startsWith("endereco.")) {
-      const field = name.split(".")[1];
+    if (name.startsWith('endereco.')) {
+      const field = name.split('.')[1];
       setForm((prev) => ({
         ...prev,
         endereco: { ...prev.endereco, [field]: value },
@@ -53,13 +52,46 @@ export default function PerfilCompany() {
     }
   };
 
+  const handleCepBlur = async () => {
+    const cep = form.endereco.cep.replace(/\D/g, '');
+    if (cep.length === 8) {
+      setBuscando(true);
+      try {
+        const resp = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+        const { logradouro, bairro, localidade, uf } = resp.data;
+        setForm((prev) => ({
+          ...prev,
+          endereco: {
+            ...prev.endereco,
+            rua: logradouro || '',
+            bairro: bairro || '',
+            cidade: localidade || '',
+            estado: uf || '',
+          },
+        }));
+      } catch (error) {
+        console.error('Erro ao buscar CEP:', error);
+      } finally {
+        setBuscando(false);
+      }
+    }
+  };
+
   const handleSave = async () => {
     if (!user || !form) return;
-    const ref = doc(db, "users", user.uid);
-    await updateDoc(ref, form);
+    const refDoc = doc(db, 'users', user.uid);
+    const updateData = {
+      ownerName: form.ownerName,
+      nome: form.companyName,
+      instagram: form.instagram,
+      whatsapp: form.whatsapp,
+      facebook: form.facebook,
+      endereco: form.endereco,
+    };
+    await updateDoc(refDoc, updateData);
     setIsEditing(false);
-    setSuccessMsg("Perfil atualizado com sucesso!");
-    setTimeout(() => setSuccessMsg(""), 3000);
+    setSuccessMsg('Perfil atualizado com sucesso!');
+    setTimeout(() => setSuccessMsg(''), 3000);
   };
 
   if (!form) return <div className="text-center mt-5">Carregando perfil...</div>;
@@ -77,8 +109,8 @@ export default function PerfilCompany() {
             <input
               type="text"
               className="form-control"
-              name="nome"
-              value={form.nome}
+              name="ownerName"
+              value={form.ownerName}
               onChange={handleChange}
               disabled={!isEditing}
             />
@@ -89,8 +121,8 @@ export default function PerfilCompany() {
             <input
               type="text"
               className="form-control"
-              name="name"
-              value={form.name}
+              name="companyName"
+              value={form.companyName}
               onChange={handleChange}
               disabled={!isEditing}
             />
@@ -101,22 +133,8 @@ export default function PerfilCompany() {
             <input
               type="email"
               className="form-control"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              disabled={!isEditing}
-            />
-          </div>
-
-          <div className="col-md-6">
-            <label>Celular</label>
-            <input
-              type="text"
-              className="form-control"
-              name="celular"
-              value={form.celular}
-              onChange={handleChange}
-              disabled={!isEditing}
+              value={user?.email || ''}
+              readOnly
             />
           </div>
 
@@ -161,6 +179,20 @@ export default function PerfilCompany() {
           <h6 className="fw-bold">Endereço</h6>
 
           <div className="col-md-4">
+            <label>CEP</label>
+            <input
+              type="text"
+              className="form-control"
+              name="endereco.cep"
+              value={form.endereco.cep}
+              onChange={handleChange}
+              onBlur={isEditing ? handleCepBlur : undefined}
+              disabled={!isEditing}
+            />
+            {buscando && <Spinner size="sm" animation="border" />}
+          </div>
+
+          <div className="col-md-4">
             <label>Rua</label>
             <input
               type="text"
@@ -184,7 +216,7 @@ export default function PerfilCompany() {
             />
           </div>
 
-          <div className="col-md-3">
+          <div className="col-md-2">
             <label>Bairro</label>
             <input
               type="text"
@@ -208,25 +240,13 @@ export default function PerfilCompany() {
             />
           </div>
 
-          <div className="col-md-4">
+          <div className="col-md-3">
             <label>Estado</label>
             <input
               type="text"
               className="form-control"
               name="endereco.estado"
               value={form.endereco.estado}
-              onChange={handleChange}
-              disabled={!isEditing}
-            />
-          </div>
-
-          <div className="col-md-4">
-            <label>CEP</label>
-            <input
-              type="text"
-              className="form-control"
-              name="endereco.cep"
-              value={form.endereco.cep}
               onChange={handleChange}
               disabled={!isEditing}
             />

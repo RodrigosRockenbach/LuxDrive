@@ -108,8 +108,8 @@ export default function LoginUser() {
                 <Link to="/cadastro" className="d-block mb-1 text-decoration-none" style={{ color: '#3437C9' }}>
                   Cadastrar
                 </Link>
-                <Link to="/company/register" className="small text-decoration-none" style={{ color: '#3437C9' }}>
-                  Empresa? Cadastrar
+                <Link to="/company/login" className="small text-decoration-none" style={{ color: '#3437C9' }}>
+                  Empresa? Entrar
                 </Link>
               </div>
             </form>

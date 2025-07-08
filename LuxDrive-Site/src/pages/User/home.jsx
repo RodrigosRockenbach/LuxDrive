@@ -105,7 +105,7 @@ export default function Home() {
 
     const filtradas = query
       ? listaEmpresas.filter(empresa =>
-          empresa.name?.toLowerCase().includes(query)
+          (empresa.nome || '').toLowerCase().includes(query)
         )
       : listaEmpresas;
 
@@ -168,41 +168,56 @@ export default function Home() {
 
           <h5 className="mb-4 fw-bold mt-5 text-start">Empresas</h5>
 
-          {loadingEmpresas ? (
-            <p>Carregando...</p>
-          ) : empresas.length > 0 ? (
+          {empresas.length > 0 ? (
             <div className="row g-4">
-              {empresas.map(empresa => (
-                <div
-                  key={empresa.id}
-                  className="col-md-6"
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => navigate(`/empresa/${empresa.id}`)}
-                >
-                  <div className="border p-3 rounded bg-white shadow-sm d-flex">
-                    <div className="me-3">
-                      {empresa.photoURL ? (
-                        <img
-                          src={empresa.photoURL}
-                          alt="Logo"
-                          className="rounded"
-                          style={{ width: '90px', height: '90px', objectFit: 'cover' }}
-                        />
-                      ) : (
-                        <div
-                          className="bg-secondary rounded"
-                          style={{ width: '90px', height: '90px' }}
-                        />
-                      )}
-                    </div>
-                    <div>
-                      <h6 className="fw-bold">{empresa.name || 'Empresa sem nome'}</h6>
-                      <p className="mb-1">{empresa.description || 'Sem descrição disponível'}</p>
-                      <p className="mb-0 text-muted">{empresa.address || 'Endereço não informado'}</p>
+              {empresas.map(empresa => {
+                const distance = empresa.distance; // placeholder para futuro cálculo de distância
+                return (
+                  <div
+                    key={empresa.id}
+                    className="col-md-6"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => navigate(`/empresa/${empresa.id}`)}
+                  >
+                    <div className="border p-3 rounded bg-white shadow-sm d-flex">
+                      <div className="me-3">
+                        {empresa.photoURL ? (
+                          <img
+                            src={empresa.photoURL}
+                            alt="Logo"
+                            className="rounded"
+                            style={{ width: '90px', height: '90px', objectFit: 'cover' }}
+                          />
+                        ) : (
+                          <div
+                            className="bg-secondary rounded"
+                            style={{ width: '90px', height: '90px' }}
+                          />
+                        )}
+                      </div>
+                      <div className="flex-grow-1">
+                        <h6 className="fw-bold">{empresa.nome || 'Empresa sem nome'}</h6>
+                        <p className="mb-1">{empresa.description || 'Sem descrição disponível'}</p>
+                        {empresa.endereco?.rua && (
+                          <p className="mb-1 text-muted">
+                            {empresa.endereco.rua}, {empresa.endereco.numero} - {empresa.endereco.bairro}
+                          </p>
+                        )}
+                        {empresa.endereco?.cidade && empresa.endereco?.estado && (
+                          <p className="mb-1 text-muted">
+                            {empresa.endereco.cidade}/{empresa.endereco.estado}
+                          </p>
+                        )}
+                        {distance !== undefined && (
+                          <p className="mb-0 text-secondary">
+                            Distância: {distance} km
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <p className="text-muted">Nenhuma empresa encontrada com esse nome.</p>
@@ -281,5 +296,5 @@ export default function Home() {
         </Form>
       </Modal>
     </>
-);
+  );
 }
