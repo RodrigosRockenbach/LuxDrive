@@ -31,7 +31,6 @@
   text-align: center;
 }
 
-/* NOVOS ESTILOS PARA QUANDO A BUSCA ESTÁ ATIVA */
 .resultados-busca {
   background-color: #fff;
   padding: 2rem;
@@ -48,13 +47,11 @@
   font-size: 0.875rem;
 }
 
-/* Reforço visual para resultados vazios */
 .sem-resultados {
   font-style: italic;
   color: #888;
 }
 
-/* Responsividade */
 @media (max-width: 576px) {
   .carousel-card {
     width: 110px;
@@ -68,4 +65,12 @@
   .resultados-busca {
     padding: 1rem;
   }
+}
+
+.empresa-desc {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

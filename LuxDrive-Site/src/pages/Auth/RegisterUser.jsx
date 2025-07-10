@@ -1,18 +1,17 @@
-import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { registerUser } from "../../services/authService";
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { registerUser } from '../../services/authService';
 import '../../styles/RegisterUser.css';
 import logoAzul from '../../assets/images/LogoAzul.png';
-import Loading from "../../components/common/Loading";
+import Loading from '../../components/common/Loading';
 
 export default function RegisterUser() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,23 +23,20 @@ export default function RegisterUser() {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      setError("As senhas não coincidem.");
+      setError('As senhas não coincidem.');
       return;
     }
 
     setIsLoading(true);
-    setError("");
+    setError('');
 
     try {
-      await registerUser(email, password, "user", {
-        name,
-        email
-      });
-
-      navigate("/login");
+      await registerUser(email, password, 'user', { name });
+      // após registro, ir para página de verificação de e-mail
+      navigate('/verify-email');
     } catch (err) {
-      console.error("Erro ao criar conta:", err);
-      setError(err.message || "Erro ao criar conta. Tente novamente.");
+      console.error('Erro ao criar conta:', err);
+      setError(err.message || 'Erro ao criar conta. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
@@ -52,7 +48,12 @@ export default function RegisterUser() {
       <div className="container shadow-lg rounded-4 overflow-hidden">
         <div className="row">
           <div className="col-md-6 d-flex align-items-center justify-content-center p-4">
-            <img src={logoAzul} alt="Logo da empresa" className="imgLogo img-fluid" style={{ maxHeight: '300px' }} />
+            <img
+              src={logoAzul}
+              alt="Logo da empresa"
+              className="imgLogo img-fluid"
+              style={{ maxHeight: '300px' }}
+            />
           </div>
 
           <div className="col-md-6 p-5">
@@ -106,11 +107,7 @@ export default function RegisterUser() {
               </div>
 
               <div className="d-grid">
-                <button
-                  type="submit"
-                  className="botao"
-                  disabled={isLoading}
-                >
+                <button type="submit" className="botao" disabled={isLoading}>
                   {isLoading ? 'Cadastrando...' : 'Cadastrar'}
                 </button>
               </div>

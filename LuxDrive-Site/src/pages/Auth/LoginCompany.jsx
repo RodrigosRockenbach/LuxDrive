@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { loginUser } from '../../services/authService';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../services/firebase';
+import { auth, db } from '../../services/firebase';
 import '../../styles/LoginCompany.css';
 import logoAzul from '../../assets/images/LogoAzul.png';
 import Loading from '../../components/common/Loading';
@@ -28,26 +28,43 @@ export default function LoginCompany() {
       const userCredential = await loginUser(email, password);
       const user = userCredential.user;
 
+      // Verifica tipo de conta
       const userDoc = await getDoc(doc(db, 'users', user.uid));
-
       const userData = userDoc.exists() ? userDoc.data() : null;
       if (!userData || userData.type !== 'company') {
         setError('Esta conta não é de empresa.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Verifica se e-mail está confirmado
+      if (!user.emailVerified) {
+        navigate('/verify-email');
+        setIsLoading(false);
         return;
       }
 
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message || 'Erro desconhecido ao fazer login.');
+      console.error('Erro no login da empresa:', err);
+      if (
+        err.code === 'auth/invalid-credential' ||
+        err.code === 'auth/user-not-found' ||
+        err.code === 'auth/wrong-password'
+      ) {
+        setError('E-mail ou senha incorretos. Verifique e tente novamente.');
+      } else {
+        setError(err.message || 'Erro desconhecido ao fazer login.');
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
+  if (isLoading) return <Loading />;
+
   return (
     <div className="login-company-page position-relative">
-      {isLoading && <Loading />}
-
       <div className="container p-5 rounded-4 shadow-lg bg-white">
         <div className="row">
           <div className="col-sm-6 d-flex justify-content-center align-items-center">
@@ -56,6 +73,8 @@ export default function LoginCompany() {
 
           <div className="col-sm-6">
             <h3 className="text-center mb-4"><dt>Login da Empresa</dt></h3>
+
+            {error && <div className="alert alert-danger">{error}</div>}
 
             <form onSubmit={handleLogin}>
               <input
@@ -68,7 +87,7 @@ export default function LoginCompany() {
               />
 
               <input
-                className="bg-transparent form-control border-bottom mb-4"
+                className="bg-transparent form-control border-bottom mb-3"
                 type="password"
                 placeholder="Senha"
                 value={password}
@@ -76,7 +95,11 @@ export default function LoginCompany() {
                 required
               />
 
-              {error && <div className="alert alert-danger">{error}</div>}
+              <div className="text-end mb-3">
+                <Link to="/forgot-password" className="small text-decoration-none" style={{ color: '#3437C9' }}>
+                  Esqueci minha senha
+                </Link>
+              </div>
 
               <button className="botaoEntrar mt-2 mb-3 w-100" type="submit" disabled={isLoading}>
                 {isLoading ? 'Entrando...' : 'Entrar'}

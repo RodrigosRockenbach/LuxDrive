@@ -210,7 +210,9 @@ export default function Home() {
                     </div>
                     <div className="flex-grow-1">
                       <h6 className="fw-bold">{e.nome || 'Empresa sem nome'}</h6>
-                      <p className="mb-1">{e.description || 'Sem descrição disponível'}</p>
+                        <p className="mb-1 empresa-desc">
+                          {e.description || 'Sem descrição disponível'}
+                        </p>
                       {e.endereco?.rua && (
                         <p className="mb-1 text-muted">
                           {e.endereco.rua}, {e.endereco.numero} - {e.endereco.bairro}

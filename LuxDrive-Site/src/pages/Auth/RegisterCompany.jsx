@@ -33,10 +33,8 @@ export default function RegisterCompany() {
   const validateCNPJ = (cnpj) => {
     const cleaned = cnpj.replace(/\D/g, '');
     if (cleaned.length !== 14) return false;
-    // Elimina CNPJs inválidos
-    const invalids = Array(14).fill(cleaned[0]).join('');
-    if (cleaned === invalids) return false;
-
+    // Elimina CNPJs inválidos (todos dígitos iguais)
+    if (/^(\d)\1+$/.test(cleaned)) return false;
     const calcCheckDigit = (numbers) => {
       let sum = 0;
       let pos = numbers.length - 7;
@@ -47,20 +45,18 @@ export default function RegisterCompany() {
       const result = sum % 11 < 2 ? 0 : 11 - (sum % 11);
       return result;
     };
-
     const numbers = cleaned.substring(0, 12);
     const digits = cleaned.substring(12);
     const firstCheck = calcCheckDigit(numbers);
     if (firstCheck !== parseInt(digits.charAt(0), 10)) return false;
-
     const secondCheck = calcCheckDigit(numbers + firstCheck);
     if (secondCheck !== parseInt(digits.charAt(1), 10)) return false;
-
     return true;
   };
 
   const handleNextStep = (e) => {
     e.preventDefault();
+    // Validação etapa 1
     if (!nome || !email || !password || !confirmPassword) {
       setError('Preencha todos os campos obrigatórios.');
       return;
@@ -78,16 +74,17 @@ export default function RegisterCompany() {
   };
 
   const handleCepBlur = async () => {
-    if (cep.replace(/\D/g, '').length === 8) {
+    const raw = cep.replace(/\D/g, '');
+    if (raw.length === 8) {
       setBuscando(true);
       try {
-        const resp = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+        const resp = await axios.get(`https://viacep.com.br/ws/${raw}/json/`);
         const { logradouro, bairro, localidade, uf } = resp.data;
         setRua(logradouro || '');
         setBairro(bairro || '');
         setCidade(localidade || '');
         setEstado(uf || '');
-      } catch (err) {
+      } catch {
         setError('Erro ao buscar CEP.');
       } finally {
         setBuscando(false);
@@ -97,6 +94,7 @@ export default function RegisterCompany() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    // Validação etapa 2
     if (!cep || !rua || !numero || !bairro || !cidade || !estado) {
       setError('Preencha todos os campos de endereço.');
       return;
@@ -107,16 +105,10 @@ export default function RegisterCompany() {
       await registerUser(email, password, 'company', {
         nome,
         ...(cnpj && { cnpj }),
-        endereco: {
-          cep,
-          rua,
-          numero,
-          bairro,
-          cidade,
-          estado
-        }
+        endereco: { cep, rua, numero, bairro, cidade, estado }
       });
-      navigate('/company/login');
+      // Após cadastro, mandar para verificação de e-mail
+      navigate('/verify-email');
     } catch (err) {
       setError(err.message || 'Erro ao registrar a empresa.');
     } finally {
@@ -125,8 +117,14 @@ export default function RegisterCompany() {
   };
 
   return (
-    <div className="register-company-page d-flex justify-content-center align-items-center" style={{ minHeight: '100vh', padding: '60px 0' }}>
-      <div className="container p-5 rounded-4 shadow-lg bg-white" style={{ width: '100%', maxWidth: '600px', minHeight: '60vh' }}>
+    <div
+      className="register-company-page d-flex justify-content-center align-items-center"
+      style={{ minHeight: '100vh', padding: '60px 0' }}
+    >
+      <div
+        className="container p-5 rounded-4 shadow-lg bg-white"
+        style={{ width: '100%', maxWidth: '600px', minHeight: '60vh' }}
+      >
         <h5 className="text-center mb-4">Cadastro da Empresa</h5>
         <form onSubmit={step === 1 ? handleNextStep : handleRegister}>
           {step === 1 && (
@@ -172,6 +170,7 @@ export default function RegisterCompany() {
               />
             </>
           )}
+
           {step === 2 && (
             <>
               <h6 className="mb-3 fw-bold">Endereço da Empresa</h6>
@@ -227,11 +226,25 @@ export default function RegisterCompany() {
               />
             </>
           )}
+
           {error && <p className="text-danger mt-2">{error}</p>}
-          <button className="botaoCadastrar mt-3 mb-3" type="submit" disabled={isLoading}>
-            {isLoading ? 'Cadastrando...' : step === 1 ? 'Continuar' : 'Cadastrar'}
+
+          <button
+            className="botaoCadastrar mt-3 mb-3"
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading
+              ? 'Cadastrando...'
+              : step === 1
+              ? 'Continuar'
+              : 'Cadastrar'}
           </button>
-          <Link to="/company/login" className="d-block text-center text-decoration-none mt-2">
+
+          <Link
+            to="/company/login"
+            className="d-block text-center text-decoration-none mt-2"
+          >
             Já tem conta? Entrar
           </Link>
         </form>

@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { loginUser } from '../../services/authService';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../services/firebase';
-
+import { auth, db } from '../../services/firebase';
 import '../../styles/LoginUser.css';
 import logoAzul from '../../assets/images/LogoAzul.png';
 import Loading from '../../components/common/Loading';
@@ -29,6 +28,7 @@ export default function LoginUser() {
       const userCredential = await loginUser(email, password);
       const user = userCredential.user;
 
+      // Verifica tipo de conta
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (!userDoc.exists() || userDoc.data().type !== 'user') {
         setError('Esta conta não é de pessoa física.');
@@ -36,8 +36,16 @@ export default function LoginUser() {
         return;
       }
 
+      // Verifica se e-mail está confirmado
+      if (!user.emailVerified) {
+        navigate('/verify-email');
+        setIsLoading(false);
+        return;
+      }
+
       navigate('/home');
     } catch (err) {
+      console.error(err);
       if (
         err.code === 'auth/invalid-credential' ||
         err.code === 'auth/user-not-found' ||
@@ -76,7 +84,7 @@ export default function LoginUser() {
                 <input
                   type="email"
                   className="form-control border-bottom rounded-0"
-                  placeholder="Email"
+                  placeholder="E-mail"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -94,12 +102,14 @@ export default function LoginUser() {
                 />
               </div>
 
+              <div className="text-end mb-3">
+                <Link to="/forgot-password" className="small text-decoration-none" style={{ color: '#3437C9' }}>
+                  Esqueci minha senha
+                </Link>
+              </div>
+
               <div className="d-grid mb-3">
-                <button
-                  type="submit"
-                  className="botao"
-                  disabled={isLoading}
-                >
+                <button type="submit" className="botao" disabled={isLoading}>
                   {isLoading ? 'Entrando...' : 'Entrar'}
                 </button>
               </div>

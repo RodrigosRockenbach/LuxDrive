@@ -6,6 +6,8 @@ import LoginUser from "./pages/Auth/LoginUser";
 import RegisterUser from "./pages/Auth/RegisterUser";
 import LoginCompany from "./pages/Auth/LoginCompany";
 import RegisterCompany from "./pages/Auth/RegisterCompany";
+import VerifyEmailPage from "./pages/Auth/VerifyEmailPage";
+import ForgotPassword from "./pages/Auth/ForgotPassword";
 
 import Home from "./pages/User/home";
 import Schedule from "./pages/User/Schedule";
@@ -36,12 +38,15 @@ function App() {
 
   return (
     <Routes>
-      {/* Rota raiz redireciona para login */}
+      {/* Rota raiz: redireciona para login de usuário */}
       <Route path="/" element={<Navigate to="/login" replace />} />
 
       {/* Rotas públicas */}
       <Route path="/login" element={<LoginUser />} />
       <Route path="/cadastro" element={<RegisterUser />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/verify-email" element={<VerifyEmailPage />} />
+
       <Route path="/company/login" element={<LoginCompany />} />
       <Route path="/company/register" element={<RegisterCompany />} />
 
