@@ -32,13 +32,15 @@ export default function Home() {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const query = new URLSearchParams(location.search).get('q')?.toLowerCase() || '';
+  const params = new URLSearchParams(location.search);
+  const searchText = params.get('q')?.toLowerCase() || '';
+  const serviceFilter = params.get('service') || '';
 
   const services = [
     { title: 'Lavagem Simples', img: lavagemSimples },
     { title: 'Lavagem Completa', img: lavagemCompleta },
     { title: 'Polimento', img: Polimento },
-    { title: 'Higienização', img: Higienizacao },
+    { title: 'Higienização', img: Higienizacao }
   ];
 
   useEffect(() => {
@@ -53,12 +55,12 @@ export default function Home() {
 
   useEffect(() => {
     fetchEmpresas();
-  }, [query]);
+  }, [searchText, serviceFilter]);
 
   const checkLocation = async () => {
     try {
-      const userRef = doc(db, 'users', user.uid);
-      const snap = await getDoc(userRef);
+      const refUser = doc(db, 'users', user.uid);
+      const snap = await getDoc(refUser);
       if (snap.exists() && !snap.data().cep) {
         setShowModal(true);
       }
@@ -68,14 +70,14 @@ export default function Home() {
   };
 
   const handleCepBlur = async () => {
-    const { cep } = locData;
+    const cep = locData.cep.replace(/\D/g, '');
     if (cep.length === 8) {
       setBuscando(true);
       try {
         const resp = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
         const { logradouro, bairro, localidade, uf } = resp.data;
-        setLocData(data => ({
-          ...data,
+        setLocData(prev => ({
+          ...prev,
           rua: logradouro || '',
           bairro: bairro || '',
           cidade: localidade || '',
@@ -89,33 +91,36 @@ export default function Home() {
     }
   };
 
-  const handleSubmitLocation = async (e) => {
+  const handleSubmitLocation = async e => {
     e.preventDefault();
-    const userRef = doc(db, 'users', user.uid);
-    await updateDoc(userRef, locData);
+    const refUser = doc(db, 'users', user.uid);
+    await updateDoc(refUser, locData);
     setShowModal(false);
   };
 
   const fetchEmpresas = async () => {
     setLoadingEmpresas(true);
-    const snapshot = await getDocs(collection(db, 'users'));
-    const listaEmpresas = snapshot.docs
-      .map(doc => ({ id: doc.id, ...doc.data() }))
-      .filter(item => item.type === 'company');
+    const snap = await getDocs(collection(db, 'users'));
+    let list = snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .filter(i => i.type === 'company');
 
-    const filtradas = query
-      ? listaEmpresas.filter(empresa =>
-          (empresa.nome || '').toLowerCase().includes(query)
-        )
-      : listaEmpresas;
+    if (searchText) {
+      list = list.filter(e =>
+        (e.nome || '').toLowerCase().includes(searchText)
+      );
+    }
+    if (serviceFilter) {
+      list = list.filter(e =>
+        (e.services || []).some(s => s.name === serviceFilter)
+      );
+    }
 
-    setEmpresas(filtradas);
+    setEmpresas(list);
     setLoadingEmpresas(false);
   };
 
-  const limparBusca = () => {
-    navigate('/home');
-  };
+  const clearFilters = () => navigate('/home');
 
   if (loadingUser || loadingLoc || loadingEmpresas) {
     return (
@@ -129,102 +134,105 @@ export default function Home() {
     <>
       <div className="home-page bg-light mt-5 pt-5">
         <div className="container">
-          {query && (
+
+          {/* Filtros ativos */}
+          {(searchText || serviceFilter) && (
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h6 className="fw-bold">
-                Resultados para: <span className="text-primary">"{query}"</span>
+                {serviceFilter
+                  ? `Serviço: ${serviceFilter}`
+                  : `Resultados para: "${searchText}"`}
               </h6>
-              <button className="btn btn-outline-secondary btn-sm" onClick={limparBusca}>
-                Limpar busca
+              <button className="btn btn-outline-secondary btn-sm" onClick={clearFilters}>
+                Limpar filtros
               </button>
             </div>
           )}
 
-          {!query && (
+          {/* Seleção de serviços */}
+          {!searchText && !serviceFilter && (
             <>
               <h5 className="mb-4 fw-bold text-start">Serviços</h5>
-
-              {/* Mobile - carrossel */}
+              {/* Mobile carousel */}
               <div className="service-carousel d-md-none mb-4">
-                {services.map((service, index) => (
-                  <div className="carousel-card" key={index}>
-                    <img src={service.img} alt={service.title} className="service-img mb-2" />
-                    <p className="fw-medium text-center">{service.title}</p>
+                {services.map((s, idx) => (
+                  <div
+                    key={idx}
+                    className="carousel-card"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => navigate(`/home?service=${encodeURIComponent(s.title)}`)}
+                  >
+                    <img src={s.img} alt={s.title} className="service-img mb-2" />
+                    <p className="fw-medium text-center">{s.title}</p>
                   </div>
                 ))}
               </div>
-
-              {/* Desktop - grid */}
+              {/* Desktop grid */}
               <div className="row g-4 d-none d-md-flex">
-                {services.map((service, index) => (
-                  <div className="col-md-3 text-center" key={index}>
-                    <img src={service.img} alt={service.title} className="service-img mb-2" />
-                    <p className="fw-medium">{service.title}</p>
+                {services.map((s, idx) => (
+                  <div
+                    key={idx}
+                    className="col-md-3 text-center"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => navigate(`/home?service=${encodeURIComponent(s.title)}`)}
+                  >
+                    <img src={s.img} alt={s.title} className="service-img mb-2" />
+                    <p className="fw-medium">{s.title}</p>
                   </div>
                 ))}
               </div>
             </>
           )}
 
+          {/* Lista de empresas */}
           <h5 className="mb-4 fw-bold mt-5 text-start">Empresas</h5>
-
           {empresas.length > 0 ? (
             <div className="row g-4">
-              {empresas.map(empresa => {
-                const distance = empresa.distance; // placeholder para futuro cálculo de distância
-                return (
-                  <div
-                    key={empresa.id}
-                    className="col-md-6"
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => navigate(`/empresa/${empresa.id}`)}
-                  >
-                    <div className="border p-3 rounded bg-white shadow-sm d-flex">
-                      <div className="me-3">
-                        {empresa.photoURL ? (
-                          <img
-                            src={empresa.photoURL}
-                            alt="Logo"
-                            className="rounded"
-                            style={{ width: '90px', height: '90px', objectFit: 'cover' }}
-                          />
-                        ) : (
-                          <div
-                            className="bg-secondary rounded"
-                            style={{ width: '90px', height: '90px' }}
-                          />
-                        )}
-                      </div>
-                      <div className="flex-grow-1">
-                        <h6 className="fw-bold">{empresa.nome || 'Empresa sem nome'}</h6>
-                        <p className="mb-1">{empresa.description || 'Sem descrição disponível'}</p>
-                        {empresa.endereco?.rua && (
-                          <p className="mb-1 text-muted">
-                            {empresa.endereco.rua}, {empresa.endereco.numero} - {empresa.endereco.bairro}
-                          </p>
-                        )}
-                        {empresa.endereco?.cidade && empresa.endereco?.estado && (
-                          <p className="mb-1 text-muted">
-                            {empresa.endereco.cidade}/{empresa.endereco.estado}
-                          </p>
-                        )}
-                        {distance !== undefined && (
-                          <p className="mb-0 text-secondary">
-                            Distância: {distance} km
-                          </p>
-                        )}
-                      </div>
+              {empresas.map(e => (
+                <div
+                  key={e.id}
+                  className="col-md-6"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => navigate(`/empresa/${e.id}`)}
+                >
+                  <div className="border p-3 rounded bg-white shadow-sm d-flex">
+                    <div className="me-3">
+                      {e.photoURL ? (
+                        <img
+                          src={e.photoURL}
+                          alt="Logo"
+                          className="rounded"
+                          style={{ width: '90px', height: '90px', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <div className="bg-secondary rounded" style={{ width: '90px', height: '90px' }} />
+                      )}
+                    </div>
+                    <div className="flex-grow-1">
+                      <h6 className="fw-bold">{e.nome || 'Empresa sem nome'}</h6>
+                      <p className="mb-1">{e.description || 'Sem descrição disponível'}</p>
+                      {e.endereco?.rua && (
+                        <p className="mb-1 text-muted">
+                          {e.endereco.rua}, {e.endereco.numero} - {e.endereco.bairro}
+                        </p>
+                      )}
+                      {e.endereco?.cidade && e.endereco?.estado && (
+                        <p className="mb-1 text-muted">
+                          {e.endereco.cidade}/{e.endereco.estado}
+                        </p>
+                      )}
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           ) : (
-            <p className="text-muted">Nenhuma empresa encontrada com esse nome.</p>
+            <p className="text-muted">Nenhuma empresa encontrada com esse filtro.</p>
           )}
         </div>
       </div>
 
+      {/* Modal CEP */}
       <Modal show={showModal} backdrop="static" centered>
         <Modal.Header>
           <Modal.Title>Complete sua localização</Modal.Title>
@@ -289,9 +297,7 @@ export default function Home() {
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="primary" type="submit">
-              Salvar
-            </Button>
+            <Button variant="primary" type="submit">Salvar</Button>
           </Modal.Footer>
         </Form>
       </Modal>
