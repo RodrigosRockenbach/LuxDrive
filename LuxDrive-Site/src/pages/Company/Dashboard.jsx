@@ -38,7 +38,10 @@ export default function Dashboard() {
       const snap = await getDoc(refDoc);
       if (snap.exists()) {
         const data = snap.data();
-        setCompany(data);
+        setCompany({
+          ...data,
+          name: data.name || data.nome
+        });
         setForm({ description: data.description || '', photoURL: data.photoURL || '' });
         setServices(data.services || []);
         setWorkingHours(data.workingHours || {});
@@ -90,8 +93,15 @@ export default function Dashboard() {
 
   const handleAddService = () => {
     const name = newService.name.trim();
-    if (!name || !newService.price) return;
-    const serviceToAdd = { ...newService, name };
+    if (!name) return alert('Informe o nome do serviço.');
+    if (!newService.price) return alert('Informe o preço.');
+    const serviceToAdd = {
+      name,
+      description: newService.description,
+      price: newService.price,
+      estimatedTime: newService.estimatedTime,
+      isCustom: newService.isCustom
+    };
     const updatedServices = [...services, serviceToAdd];
     setServices(updatedServices);
     updateDoc(doc(db, 'users', user.uid), { services: updatedServices });
@@ -113,6 +123,7 @@ export default function Dashboard() {
   };
 
   const handleSaveEditedService = async () => {
+    if (editingServiceIndex == null) return;
     await updateDoc(doc(db, 'users', user.uid), { services });
     setEditingServiceIndex(null);
   };
@@ -161,11 +172,12 @@ export default function Dashboard() {
             ) : (
               <div className="position-relative bg-white p-2 rounded">
                 <p className="mb-0">{company.description || 'Sem descrição'}</p>
-                <FaEdit
-                  role="button"
+                <button
+                  className="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
                   onClick={() => setIsEditing(true)}
-                  className="position-absolute top-0 end-0 m-2"
-                />
+                >
+                  <FaEdit />
+                </button>
               </div>
             )}
           </div>
@@ -180,7 +192,44 @@ export default function Dashboard() {
                 <div className="border rounded p-3 bg-white shadow-sm position-relative">
                   {editingServiceIndex === idx ? (
                     <>
-                      {/* Edited form omitted for brevity */}
+                      <input
+                        type="text"
+                        className="form-control mb-2"
+                        value={services[idx].name}
+                        onChange={e => handleServiceChange(e, idx, 'name')}
+                      />
+                      <input
+                        type="text"
+                        className="form-control mb-2"
+                        value={services[idx].description}
+                        onChange={e => handleServiceChange(e, idx, 'description')}
+                      />
+                      <input
+                        type="number"
+                        className="form-control mb-2"
+                        value={services[idx].price}
+                        onChange={e => handleServiceChange(e, idx, 'price')}
+                      />
+                      <input
+                        type="time"
+                        className="form-control mb-2"
+                        value={services[idx].estimatedTime}
+                        onChange={e => handleServiceChange(e, idx, 'estimatedTime')}
+                      />
+                      <div className="d-flex gap-2">
+                        <button
+                          className="btn btn-success btn-sm flex-grow-1"
+                          onClick={handleSaveEditedService}
+                        >
+                          <FaCheck /> Salvar
+                        </button>
+                        <button
+                          className="btn btn-secondary btn-sm flex-grow-1"
+                          onClick={() => setEditingServiceIndex(null)}
+                        >
+                          Cancelar
+                        </button>
+                      </div>
                     </>
                   ) : (
                     <>
@@ -189,8 +238,12 @@ export default function Dashboard() {
                       <p><strong>Valor:</strong> R$ {parseFloat(srv.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                       <p><strong>Tempo Estimado:</strong> {srv.estimatedTime}h</p>
                       <div className="d-flex gap-2 position-absolute bottom-0 end-0 m-2">
-                        <FaEdit role="button" onClick={() => handleEditService(idx)} />
-                        <FaTrash role="button" className="text-danger" onClick={() => handleDeleteService(idx)} />
+                        <button type="button" className="btn btn-sm btn-outline-secondary p-1" onClick={() => handleEditService(idx)}>
+                          <FaEdit />
+                        </button>
+                        <button type="button" className="btn btn-sm btn-outline-danger p-1" onClick={() => handleDeleteService(idx)}>
+                          <FaTrash />
+                        </button>
                       </div>
                     </>
                   )}
@@ -275,21 +328,45 @@ export default function Dashboard() {
                 const horario = workingHours[day] || {};
                 const editing = editingDay && editingDay.day === day;
                 const closed = horario.fechado;
+                const hasHorario =
+                  horario.manhaInicio ||
+                  horario.manhaFim ||
+                  horario.tardeInicio ||
+                  horario.tardeFim;
+
                 return (
-                  <div className={`col-md-3 ${closed ? 'bg-danger-subtle' : ''}`} key={day}>
-                    <div className="p-3 border rounded small-card h-100">
+                  <div className="col-md-3" key={day}>
+                    {/* fundo só no card interno: */}
+                    <div
+                      className={`
+                        p-3
+                        border
+                        rounded
+                        small-card
+                        h-100
+                        ${closed ? 'bg-danger-subtle' : ''}
+                        ${!closed && hasHorario ? 'bg-primary-subtle' : ''}
+                      `}
+                    >
                       <div className="d-flex justify-content-between align-items-center mb-2">
                         <strong className="text-capitalize">{day}</strong>
                         {!editing ? (
-                          <button className="btn btn-outline-primary btn-sm" onClick={() => setEditingDay({ day, ...horario })}>
+                          <button
+                            className="btn btn-outline-primary btn-sm"
+                            onClick={() => setEditingDay({ day, ...horario })}
+                          >
                             <FaEdit />
                           </button>
                         ) : (
-                          <button className="btn btn-outline-success btn-sm" onClick={() => saveWorkingHours(day)}>
+                          <button
+                            className="btn btn-outline-success btn-sm"
+                            onClick={() => saveWorkingHours(day)}
+                          >
                             <FaCheck />
                           </button>
                         )}
                       </div>
+
                       {editing && (
                         <>
                           <div className="mb-2">
@@ -298,7 +375,9 @@ export default function Dashboard() {
                               type="time"
                               className="form-control form-control-sm"
                               value={editingDay.manhaInicio || ''}
-                              onChange={e => setEditingDay(prev => ({ ...prev, manhaInicio: e.target.value }))}
+                              onChange={e =>
+                                setEditingDay(prev => ({ ...prev, manhaInicio: e.target.value }))
+                              }
                             />
                           </div>
                           <div className="mb-2">
@@ -307,7 +386,9 @@ export default function Dashboard() {
                               type="time"
                               className="form-control form-control-sm"
                               value={editingDay.manhaFim || ''}
-                              onChange={e => setEditingDay(prev => ({ ...prev, manhaFim: e.target.value }))}
+                              onChange={e =>
+                                setEditingDay(prev => ({ ...prev, manhaFim: e.target.value }))
+                              }
                             />
                           </div>
                           <div className="mb-2">
@@ -316,7 +397,9 @@ export default function Dashboard() {
                               type="time"
                               className="form-control form-control-sm"
                               value={editingDay.tardeInicio || ''}
-                              onChange={e => setEditingDay(prev => ({ ...prev, tardeInicio: e.target.value }))}
+                              onChange={e =>
+                                setEditingDay(prev => ({ ...prev, tardeInicio: e.target.value }))
+                              }
                             />
                           </div>
                           <div className="mb-2">
@@ -325,10 +408,15 @@ export default function Dashboard() {
                               type="time"
                               className="form-control form-control-sm"
                               value={editingDay.tardeFim || ''}
-                              onChange={e => setEditingDay(prev => ({ ...prev, tardeFim: e.target.value }))}
+                              onChange={e =>
+                                setEditingDay(prev => ({ ...prev, tardeFim: e.target.value }))
+                              }
                             />
                           </div>
-                          <button className="btn btn-dark btn-sm w-100" onClick={() => toggleClosedDay(day)}>
+                          <button
+                            className="btn btn-dark btn-sm w-100"
+                            onClick={() => toggleClosedDay(day)}
+                          >
                             Fechar dia
                           </button>
                         </>

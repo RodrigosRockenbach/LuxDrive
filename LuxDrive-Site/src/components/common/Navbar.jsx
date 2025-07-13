@@ -15,22 +15,20 @@ export default function Navbar() {
   const [showSidebar, setShowSidebar] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [user] = useAuthState(auth);
-  const [userName, setUserName] = useState('Seu Nome');
+  const [userName, setUserName] = useState('Usuário');
   const [userPhoto, setUserPhoto] = useState(null);
 
   const navigate = useNavigate();
 
-  // Busca nome e foto do usuário no Firestore
   useEffect(() => {
     const fetchUserData = async () => {
-      if (user) {
-        const ref = doc(db, 'users', user.uid);
-        const snap = await getDoc(ref);
-        if (snap.exists()) {
-          const data = snap.data();
-          setUserName(data.name || 'Usuário');
-          setUserPhoto(data.photoURL || null);
-        }
+      if (!user) return;
+      const ref = doc(db, 'users', user.uid);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        const data = snap.data();
+        setUserName(data.name || data.nome || 'Usuário');
+        setUserPhoto(data.photoURL || null);
       }
     };
     fetchUserData();
@@ -38,7 +36,7 @@ export default function Navbar() {
 
   const handleSearch = e => {
     e.preventDefault();
-    if (searchTerm.trim() !== '') {
+    if (searchTerm.trim()) {
       navigate(`/home?q=${encodeURIComponent(searchTerm.trim())}`);
       setSearchTerm('');
       setIsOpen(false);
@@ -65,14 +63,13 @@ export default function Navbar() {
             className="navbar-toggler"
             type="button"
             onClick={toggleMenu}
-            aria-controls="navbarNav"
             aria-expanded={isOpen}
             aria-label="Toggle navigation"
           >
             {isOpen ? <span>&times;</span> : <span className="navbar-toggler-icon"></span>}
           </button>
 
-          <div className={`collapse navbar-collapse ${isOpen ? 'show' : ''}`} id="navbarNav">
+          <div className={`collapse navbar-collapse ${isOpen ? 'show' : ''}`}>
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               <li className="nav-item">
                 <Link className="nav-link" to="/home" onClick={closeMenu}>Início</Link>
@@ -101,29 +98,28 @@ export default function Navbar() {
               onClick={() => setShowSidebar(true)}
               type="button"
             >
-              <FaBars className="icon-light-bars" size={26}  />
+              <FaBars className="icon-light-bars" size={26} />
             </button>
           </div>
         </div>
       </nav>
 
-      {/* Sidebar */}
+      {/* Sidebar Mobile */}
       {showSidebar && (
         <div className="sidebar-overlay" onClick={() => setShowSidebar(false)}>
           <div className="sidebar" onClick={e => e.stopPropagation()}>
-            <div className="sidebar-header position-relative d-flex flex-column align-items-center p-4" style={{ minHeight: '150px' }}>
+            <div className="sidebar-header d-flex flex-column align-items-center p-4">
               <button
                 className="btn-close position-absolute top-0 end-0 m-2"
                 onClick={() => setShowSidebar(false)}
+                aria-label="Fechar menu"
               />
-
               <img
                 src={userPhoto || perfilImage}
                 alt="Foto de perfil"
-                className="rounded-circle mb-3"
+                className="rounded-circle mb-2"
                 style={{ width: '80px', height: '80px', objectFit: 'cover' }}
               />
-
               <strong>{userName}</strong>
             </div>
 
@@ -143,7 +139,11 @@ export default function Navbar() {
               <li className="list-group-item sidebar-item">
                 <Link to="/company/register" onClick={() => setShowSidebar(false)}>Trabalhe Conosco</Link>
               </li>
-              <li className="list-group-item sidebar-item text-danger" onClick={handleLogout} style={{ cursor: 'pointer' }}>
+              <li
+                className="list-group-item sidebar-item text-danger"
+                style={{ cursor: 'pointer' }}
+                onClick={() => { handleLogout(); setShowSidebar(false); }}
+              >
                 Sair
               </li>
             </ul>

@@ -13,6 +13,13 @@ import Higienizacao from '../../assets/images/Higienizaçao.jpg';
 
 import '../../styles/Home.css';
 
+// Normaliza string removendo acentos e convertendo para minúsculas
+const normalize = str =>
+  str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+
 export default function Home() {
   const [user, loadingUser] = useAuthState(auth);
   const [showModal, setShowModal] = useState(false);
@@ -33,7 +40,7 @@ export default function Home() {
   const navigate = useNavigate();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const searchText = params.get('q')?.toLowerCase() || '';
+  const searchText = params.get('q') || '';
   const serviceFilter = params.get('service') || '';
 
   const services = [
@@ -106,8 +113,9 @@ export default function Home() {
       .filter(i => i.type === 'company');
 
     if (searchText) {
+      const qNorm = normalize(searchText);
       list = list.filter(e =>
-        (e.nome || '').toLowerCase().includes(searchText)
+        normalize(e.name || '').includes(qNorm)
       );
     }
     if (serviceFilter) {
@@ -159,7 +167,6 @@ export default function Home() {
                   <div
                     key={idx}
                     className="carousel-card"
-                    style={{ cursor: 'pointer' }}
                     onClick={() => navigate(`/home?service=${encodeURIComponent(s.title)}`)}
                   >
                     <img src={s.img} alt={s.title} className="service-img mb-2" />
@@ -173,7 +180,6 @@ export default function Home() {
                   <div
                     key={idx}
                     className="col-md-3 text-center"
-                    style={{ cursor: 'pointer' }}
                     onClick={() => navigate(`/home?service=${encodeURIComponent(s.title)}`)}
                   >
                     <img src={s.img} alt={s.title} className="service-img mb-2" />
@@ -192,7 +198,6 @@ export default function Home() {
                 <div
                   key={e.id}
                   className="col-md-6"
-                  style={{ cursor: 'pointer' }}
                   onClick={() => navigate(`/empresa/${e.id}`)}
                 >
                   <div className="border p-3 rounded bg-white shadow-sm d-flex">
@@ -209,10 +214,10 @@ export default function Home() {
                       )}
                     </div>
                     <div className="flex-grow-1">
-                      <h6 className="fw-bold">{e.name || 'Empresa sem nome'}</h6>
-                        <p className="mb-1 empresa-desc">
-                          {e.description || 'Sem descrição disponível'}
-                        </p>
+                      <h6 className="fw-bold">{e.name}</h6>
+                      <p className="mb-1 empresa-desc">
+                        {e.description || 'Sem descrição disponível'}
+                      </p>
                       {e.endereco?.rua && (
                         <p className="mb-1 text-muted">
                           {e.endereco.rua}, {e.endereco.numero} - {e.endereco.bairro}
@@ -234,7 +239,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Modal CEP */}
+      {/* Modal de CEP */}
       <Modal show={showModal} backdrop="static" centered>
         <Modal.Header>
           <Modal.Title>Complete sua localização</Modal.Title>
