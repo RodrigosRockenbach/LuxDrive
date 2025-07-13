@@ -145,7 +145,7 @@ export default function Dashboard() {
             />
           </div>
           <div className="flex-grow-1">
-            <h4 className="fw-bold">{company.nome}</h4>
+            <h4 className="fw-bold">{company.name}</h4>
             {isEditing ? (
               <>
                 <textarea

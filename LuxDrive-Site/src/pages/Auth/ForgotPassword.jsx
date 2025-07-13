@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { requestPasswordReset } from '../../services/authService';
 import { Form, Button, Alert } from 'react-bootstrap';
-// import '../../styles/ForgotPassword.css';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
-  const [status, setStatus] = useState(null); // 'sent' | 'error'
+  const [status, setStatus] = useState(null); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();

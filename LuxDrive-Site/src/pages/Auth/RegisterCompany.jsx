@@ -11,7 +11,7 @@ export default function RegisterCompany() {
   const [buscando, setBuscando] = useState(false);
   const navigate = useNavigate();
 
-  const [nome, setNome] = useState('');
+  const [name, setName] = useState('');
   const [cnpj, setCnpj] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -57,7 +57,7 @@ export default function RegisterCompany() {
   const handleNextStep = (e) => {
     e.preventDefault();
     // Validação etapa 1
-    if (!nome || !email || !password || !confirmPassword) {
+    if (!name || !email || !password || !confirmPassword) {
       setError('Preencha todos os campos obrigatórios.');
       return;
     }
@@ -103,7 +103,7 @@ export default function RegisterCompany() {
     setIsLoading(true);
     try {
       await registerUser(email, password, 'company', {
-        nome,
+        name,
         ...(cnpj && { cnpj }),
         endereco: { cep, rua, numero, bairro, cidade, estado }
       });
@@ -133,8 +133,8 @@ export default function RegisterCompany() {
                 className="form-control border-bottom mb-3"
                 type="text"
                 placeholder="Nome da Empresa"
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 required
               />
               <input

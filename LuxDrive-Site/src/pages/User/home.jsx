@@ -209,7 +209,7 @@ export default function Home() {
                       )}
                     </div>
                     <div className="flex-grow-1">
-                      <h6 className="fw-bold">{e.nome || 'Empresa sem nome'}</h6>
+                      <h6 className="fw-bold">{e.name || 'Empresa sem nome'}</h6>
                         <p className="mb-1 empresa-desc">
                           {e.description || 'Sem descrição disponível'}
                         </p>
