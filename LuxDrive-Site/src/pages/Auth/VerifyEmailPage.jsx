@@ -1,46 +1,63 @@
-import React, { useState, useEffect } from 'react';
-import { getAuth, sendEmailVerification } from 'firebase/auth';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { useNavigate } from 'react-router-dom';
-import { Button, Alert } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { applyActionCode } from 'firebase/auth';
+import { auth } from '../../services/firebase';
+import { Spinner, Alert, Button, Container } from 'react-bootstrap';
 
 export default function VerifyEmailPage() {
-  const auth = getAuth();
-  const [user, loading] = useAuthState(auth);
-  const [sent, setSent] = useState(false);
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [status, setStatus] = useState<'loading'|'success'|'error'|'invalid'>('loading');
 
   useEffect(() => {
-    if (!loading && user && user.emailVerified) {
-      navigate('/home');
-    }
-  }, [user, loading, navigate]);
+    const mode = searchParams.get('mode');
+    const oobCode = searchParams.get('oobCode');
 
-  const handleResend = async () => {
-    if (user) {
-      await sendEmailVerification(user);
-      setSent(true);
+    if (mode === 'verifyEmail' && oobCode) {
+      applyActionCode(auth, oobCode)
+        .then(() => setStatus('success'))
+        .catch(() => setStatus('error'));
+    } else {
+      setStatus('invalid');
     }
+  }, [searchParams]);
+
+  const handleGoToLogin = () => {
+    navigate('/login', { replace: true });
   };
 
-  if (loading || !user) {
-    return null; // 
-  }
-
   return (
-    <div className="container mt-5 text-center">
-      <h4>Verifique seu e-mail</h4>
-      <p>
-        Enviamos um link de verificação para <strong>{user.email}</strong>.
-        <br />
-        Clique no link na sua caixa de entrada para ativar sua conta.
-      </p>
+    <Container className="mt-5">
+      {status === 'loading' && (
+        <div className="text-center">
+          <Spinner animation="border" role="status" />
+          <p className="mt-3">Validando e‑mail, por favor aguarde...</p>
+        </div>
+      )}
 
-      {sent && <Alert variant="success">Link reenviado com sucesso!</Alert>}
+      {status === 'success' && (
+        <Alert variant="success" className="text-center">
+          <Alert.Heading>E‑mail verificado com sucesso!</Alert.Heading>
+          <p>Agora você pode fazer login.</p>
+          <Button onClick={handleGoToLogin}>Ir para Login</Button>
+        </Alert>
+      )}
 
-      <Button onClick={handleResend} disabled={sent} className="mt-3">
-        {sent ? 'Enviado' : 'Reenviar link'}
-      </Button>
-    </div>
+      {status === 'error' && (
+        <Alert variant="danger" className="text-center">
+          <Alert.Heading>Falha na verificação</Alert.Heading>
+          <p>Este link é inválido ou expirou. Peça um novo e‑mail de verificação.</p>
+          <Button onClick={handleGoToLogin}>Ir para Login</Button>
+        </Alert>
+      )}
+
+      {status === 'invalid' && (
+        <Alert variant="warning" className="text-center">
+          <Alert.Heading>Parâmetros Inválidos</Alert.Heading>
+          <p>Não foi possível processar a verificação de e‑mail.</p>
+          <Button onClick={handleGoToLogin}>Ir para Login</Button>
+        </Alert>
+      )}
+    </Container>
   );
 }

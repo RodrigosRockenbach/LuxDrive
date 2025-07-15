@@ -8,10 +8,9 @@ import {
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../services/firebase';
 
-// Configurações de ação para enviar o usuário de volta à tela de login
 const actionCodeSettings = {
-  url: `${window.location.origin}/login`,
-  handleCodeInApp: false
+  url: `${window.location.origin}/verify-email`,
+  handleCodeInApp: true
 };
 
 export async function registerUser(email, password, accountType, extraData = {}) {
@@ -19,14 +18,12 @@ export async function registerUser(email, password, accountType, extraData = {})
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // Grava dados do perfil no Firestore
     await setDoc(doc(db, 'users', user.uid), {
       type: accountType,
       email,
       ...extraData
     });
 
-    // Envia e‑mail de verificação apontando para /login
     await sendEmailVerification(user, actionCodeSettings);
 
     return userCredential;
@@ -65,7 +62,6 @@ export async function logoutUser() {
 
 export async function requestPasswordReset(email) {
   try {
-    // Ao redirecionar após reset de senha, também ir para /login
     await sendPasswordResetEmail(auth, email, actionCodeSettings);
   } catch (err) {
     console.error('Erro ao solicitar reset de senha:', err);
