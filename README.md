@@ -1,4 +1,4 @@
 # LuxDrive
-Projeto de desenvolvido para PDS
+Projeto desenvolvido para PDS
 
-Link do site luxdrive-wash.vercel.app
+Acesse o site clicando [aqui](https://luxdrive-wash.vercel.app)!
