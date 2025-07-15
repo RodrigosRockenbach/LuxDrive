@@ -6,7 +6,7 @@ import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDRQXBxo3VFBNAT7ccuBpXVXnt1uRpOLhE",
-  authDomain: "site-luxdrive.firebaseapp.com",
+  authDomain: "luxdrive-wash.vercel.app",
   projectId: "site-luxdrive",
   storageBucket: "site-luxdrive.firebasestorage.app",
   messagingSenderId: "543815599538",
