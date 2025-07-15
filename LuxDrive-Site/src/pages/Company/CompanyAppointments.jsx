@@ -80,9 +80,6 @@ export default function CompanyAppointments() {
 
     await deleteDoc(doc(db, "appointments", selectedEvent.id));
 
-    // Envio de e-mail ao cliente (exemplo, adapte com seu sistema de envio):
-    // await sendCancellationEmail(selectedEvent.extendedProps.clientEmail, selectedEvent.extendedProps);
-
     setEvents(prev => prev.filter(e => e.id !== selectedEvent.id));
     setSelectedEvent(null);
   };

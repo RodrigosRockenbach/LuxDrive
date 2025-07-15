@@ -52,7 +52,7 @@ export default function UserAppointments() {
       const companySnap = await getDoc(companyRef);
       const companyEmail = companySnap.exists() ? companySnap.data().email : "empresa@example.com";
 
-      // Simule envio de e-mail
+    
       console.log(`E-mail enviado para ${companyEmail}: o cliente ${appointment.clientName} cancelou o serviço.`);
 
       setAppointments(prev => prev.filter(a => a.id !== appointment.id));
