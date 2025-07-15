@@ -13,7 +13,6 @@ import Higienizacao from '../../assets/images/Higienizaçao.jpg';
 
 import '../../styles/Home.css';
 
-// Normaliza string removendo acentos e convertendo para minúsculas
 const normalize = str =>
   str
     .normalize('NFD')
