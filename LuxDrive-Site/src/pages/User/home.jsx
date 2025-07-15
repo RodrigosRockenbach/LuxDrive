@@ -11,7 +11,7 @@ import lavagemCompleta from '../../assets/images/lavagemCompleta.jpg';
 import Polimento from '../../assets/images/Polimento.jpg';
 import Higienizacao from '../../assets/images/Higienizaçao.jpg';
 
-import '../../styles/home.css';
+// import '../../styles/home.css';
 
 const normalize = str =>
   str
