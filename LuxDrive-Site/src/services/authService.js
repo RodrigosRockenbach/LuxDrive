@@ -8,8 +8,9 @@ import {
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../services/firebase';
 
+// Configurações de ação para enviar o usuário de volta à tela de login
 const actionCodeSettings = {
-  url: 'https://luxdrive-wash.vercel.app/verify-email',
+  url: `${window.location.origin}/login`,
   handleCodeInApp: false
 };
 
@@ -18,12 +19,14 @@ export async function registerUser(email, password, accountType, extraData = {})
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
+    // Grava dados do perfil no Firestore
     await setDoc(doc(db, 'users', user.uid), {
       type: accountType,
       email,
       ...extraData
     });
 
+    // Envia e‑mail de verificação apontando para /login
     await sendEmailVerification(user, actionCodeSettings);
 
     return userCredential;
@@ -62,10 +65,8 @@ export async function logoutUser() {
 
 export async function requestPasswordReset(email) {
   try {
-    await sendPasswordResetEmail(auth, email, {
-      url: 'https://luxdrive-wash.vercel.app/login',
-      handleCodeInApp: false
-    });
+    // Ao redirecionar após reset de senha, também ir para /login
+    await sendPasswordResetEmail(auth, email, actionCodeSettings);
   } catch (err) {
     console.error('Erro ao solicitar reset de senha:', err);
     throw new Error('Não foi possível enviar e‑mail de redefinição.');
