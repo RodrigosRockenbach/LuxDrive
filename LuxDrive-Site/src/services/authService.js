@@ -8,31 +8,28 @@ import {
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../services/firebase';
 
-/**
- * Cria novo usuário e envia e-mail de verificação.
- */
+const actionCodeSettings = {
+  url: 'https://luxdrive-wash.vercel.app/verify-email',
+  handleCodeInApp: false
+};
+
 export async function registerUser(email, password, accountType, extraData = {}) {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // Grava dados do perfil no Firestore
     await setDoc(doc(db, 'users', user.uid), {
       type: accountType,
       email,
       ...extraData
     });
 
-    // Envia e-mail de verificação apontando para /verify-email
-    await sendEmailVerification(user, {
-      url: window.location.origin + '/verify-email',
-      handleCodeInApp: false
-    });
+    await sendEmailVerification(user, actionCodeSettings);
 
     return userCredential;
   } catch (err) {
     if (err.code === 'auth/email-already-in-use') {
-      throw new Error('Este e-mail já está em uso.');
+      throw new Error('Este e‑mail já está em uso.');
     } else if (err.code === 'auth/weak-password') {
       throw new Error('A senha deve conter pelo menos 6 caracteres.');
     }
@@ -40,9 +37,6 @@ export async function registerUser(email, password, accountType, extraData = {})
   }
 }
 
-/**
- * Faz login de usuário existente.
- */
 export async function loginUser(email, password) {
   try {
     return await signInWithEmailAndPassword(auth, email, password);
@@ -52,15 +46,12 @@ export async function loginUser(email, password) {
       err.code === 'auth/wrong-password' ||
       err.code === 'auth/invalid-credential'
     ) {
-      throw new Error('E-mail ou senha incorretos.');
+      throw new Error('E‑mail ou senha incorretos.');
     }
     throw new Error('Erro ao fazer login. Tente novamente mais tarde.');
   }
 }
 
-/**
- * Encerra sessão do usuário.
- */
 export async function logoutUser() {
   try {
     await signOut(auth);
@@ -69,14 +60,14 @@ export async function logoutUser() {
   }
 }
 
-/**
- * Solicita envio de e-mail para redefinição de senha.
- */
 export async function requestPasswordReset(email) {
   try {
-    await sendPasswordResetEmail(auth, email);
+    await sendPasswordResetEmail(auth, email, {
+      url: 'https://luxdrive-wash.vercel.app/login',
+      handleCodeInApp: false
+    });
   } catch (err) {
     console.error('Erro ao solicitar reset de senha:', err);
-    throw new Error('Não foi possível enviar e-mail de redefinição.');
+    throw new Error('Não foi possível enviar e‑mail de redefinição.');
   }
 }
