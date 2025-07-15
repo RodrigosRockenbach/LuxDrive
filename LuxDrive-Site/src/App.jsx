@@ -8,6 +8,7 @@ import LoginCompany from "./pages/Auth/LoginCompany";
 import RegisterCompany from "./pages/Auth/RegisterCompany";
 import VerifyEmailPage from "./pages/Auth/VerifyEmailPage";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
+import ResetPassword from "./pages/Auth/ResetPassword";  // <-- Certifique-se de criar este arquivo
 
 import Home from "./pages/User/home";
 import Schedule from "./pages/User/Schedule";
@@ -45,12 +46,13 @@ function App() {
       <Route path="/login" element={<LoginUser />} />
       <Route path="/cadastro" element={<RegisterUser />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} /> 
       <Route path="/verify-email" element={<VerifyEmailPage />} />
 
       <Route path="/company/login" element={<LoginCompany />} />
       <Route path="/company/register" element={<RegisterCompany />} />
 
-      {/* Rotas protegidas - usuário */}
+      {/* Rotas protegidas — usuário */}
       <Route
         element={
           <PrivateRoute requiredType="user">
@@ -65,7 +67,7 @@ function App() {
         <Route path="/perfil" element={<UserProfile />} />
       </Route>
 
-      {/* Rotas protegidas - empresa */}
+      {/* Rotas protegidas — empresa */}
       <Route
         element={
           <PrivateRoute requiredType="company">
@@ -78,7 +80,7 @@ function App() {
         <Route path="/empresa/perfil" element={<PerfilCompany />} />
       </Route>
 
-      {/* Página de erro */}
+      {/* Página de erro para qualquer outra rota */}
       <Route path="*" element={<ErrorPage />} />
     </Routes>
   );

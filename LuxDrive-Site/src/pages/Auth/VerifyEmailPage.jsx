@@ -7,7 +7,7 @@ import { Spinner, Alert, Button, Container } from 'react-bootstrap';
 export default function VerifyEmailPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [status, setStatus] = useState<'loading'|'success'|'error'|'invalid'>('loading');
+  const [status, setStatus] = useState('loading');
 
   useEffect(() => {
     const mode = searchParams.get('mode');
@@ -22,9 +22,7 @@ export default function VerifyEmailPage() {
     }
   }, [searchParams]);
 
-  const handleGoToLogin = () => {
-    navigate('/login', { replace: true });
-  };
+  const goToLogin = () => navigate('/login', { replace: true });
 
   return (
     <Container className="mt-5">
@@ -39,7 +37,7 @@ export default function VerifyEmailPage() {
         <Alert variant="success" className="text-center">
           <Alert.Heading>E‑mail verificado com sucesso!</Alert.Heading>
           <p>Agora você pode fazer login.</p>
-          <Button onClick={handleGoToLogin}>Ir para Login</Button>
+          <Button onClick={goToLogin}>Ir para Login</Button>
         </Alert>
       )}
 
@@ -47,7 +45,7 @@ export default function VerifyEmailPage() {
         <Alert variant="danger" className="text-center">
           <Alert.Heading>Falha na verificação</Alert.Heading>
           <p>Este link é inválido ou expirou. Peça um novo e‑mail de verificação.</p>
-          <Button onClick={handleGoToLogin}>Ir para Login</Button>
+          <Button onClick={goToLogin}>Ir para Login</Button>
         </Alert>
       )}
 
@@ -55,7 +53,7 @@ export default function VerifyEmailPage() {
         <Alert variant="warning" className="text-center">
           <Alert.Heading>Parâmetros Inválidos</Alert.Heading>
           <p>Não foi possível processar a verificação de e‑mail.</p>
-          <Button onClick={handleGoToLogin}>Ir para Login</Button>
+          <Button onClick={goToLogin}>Ir para Login</Button>
         </Alert>
       )}
     </Container>
