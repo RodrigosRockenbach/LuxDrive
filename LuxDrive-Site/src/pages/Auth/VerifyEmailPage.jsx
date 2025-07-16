@@ -1,61 +1,47 @@
-import React, { useEffect, useState } from 'react';
+// src/pages/Auth/VerifyEmailPage.jsx
+import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { applyActionCode } from 'firebase/auth';
 import { auth } from '../../services/firebase';
-import { Spinner, Alert, Button, Container } from 'react-bootstrap';
 
 export default function VerifyEmailPage() {
+  const [message, setMessage] = useState('Validando...');
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [status, setStatus] = useState('loading');
 
   useEffect(() => {
     const mode = searchParams.get('mode');
     const oobCode = searchParams.get('oobCode');
 
-    if (mode === 'verifyEmail' && oobCode) {
-      applyActionCode(auth, oobCode)
-        .then(() => setStatus('success'))
-        .catch(() => setStatus('error'));
-    } else {
-      setStatus('invalid');
+    if (mode !== 'verifyEmail' || !oobCode) {
+      setMessage('Link de verificação inválido.');
+      return;
     }
+
+    applyActionCode(auth, oobCode)
+      .then(() => {
+        setMessage('E‑mail verificado com sucesso! Você já pode fazer login.');
+      })
+      .catch((error) => {
+        console.error('Erro applyActionCode:', error);
+        setMessage('Não foi possível verificar seu e‑mail. O link pode estar expirado.');
+      });
   }, [searchParams]);
 
-  const goToLogin = () => navigate('/login', { replace: true });
-
   return (
-    <Container className="mt-5">
-      {status === 'loading' && (
-        <div className="text-center">
-          <Spinner animation="border" role="status" />
-          <p className="mt-3">Validando e‑mail, por favor aguarde...</p>
+    <div className="vh-100 d-flex justify-content-center align-items-center bg-primary">
+      <div className="card shadow" style={{ maxWidth: 400, width: '90%' }}>
+        <div className="card-body text-center">
+          <h5 className="card-title mb-3">Verificação de E‑mail</h5>
+          <p className="card-text">{message}</p>
+          <button
+            className="btn btn-primary"
+            onClick={() => navigate('/login')}
+          >
+            Ir para Login
+          </button>
         </div>
-      )}
-
-      {status === 'success' && (
-        <Alert variant="success" className="text-center">
-          <Alert.Heading>E‑mail verificado com sucesso!</Alert.Heading>
-          <p>Agora você pode fazer login.</p>
-          <Button onClick={goToLogin}>Ir para Login</Button>
-        </Alert>
-      )}
-
-      {status === 'error' && (
-        <Alert variant="danger" className="text-center">
-          <Alert.Heading>Falha na verificação</Alert.Heading>
-          <p>Este link é inválido ou expirou. Peça um novo e‑mail de verificação.</p>
-          <Button onClick={goToLogin}>Ir para Login</Button>
-        </Alert>
-      )}
-
-      {status === 'invalid' && (
-        <Alert variant="warning" className="text-center">
-          <Alert.Heading>Parâmetros Inválidos</Alert.Heading>
-          <p>Não foi possível processar a verificação de e‑mail.</p>
-          <Button onClick={goToLogin}>Ir para Login</Button>
-        </Alert>
-      )}
-    </Container>
+      </div>
+    </div>
   );
 }
