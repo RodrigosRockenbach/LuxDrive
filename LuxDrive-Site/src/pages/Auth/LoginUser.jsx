@@ -28,7 +28,6 @@ export default function LoginUser() {
       const userCredential = await loginUser(email, password);
       const user = userCredential.user;
 
-      // Verifica tipo de conta
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (!userDoc.exists() || userDoc.data().type !== 'user') {
         setError('Esta conta não é de pessoa física.');

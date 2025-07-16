@@ -28,7 +28,6 @@ export default function LoginCompany() {
       const userCredential = await loginUser(email, password);
       const user = userCredential.user;
 
-      // Verifica tipo de conta
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       const userData = userDoc.exists() ? userDoc.data() : null;
       if (!userData || userData.type !== 'company') {
@@ -37,9 +36,8 @@ export default function LoginCompany() {
         return;
       }
 
-      // Verifica se e-mail está confirmado
       if (!user.emailVerified) {
-        navigate('/verify-email');
+        setError('Verifique seu e‑mail antes de entrar no sistema.');
         setIsLoading(false);
         return;
       }
