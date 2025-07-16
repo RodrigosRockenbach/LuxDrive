@@ -13,19 +13,17 @@ export default function VerifyEmailPage() {
     const mode = search.get('mode');
     const code = search.get('oobCode');
 
-    // Se não vier código nem modo, mostrar prompt para verificar email
     if (!mode && !code) {
       setStatus('prompt');
       return;
     }
 
-    // Se veio modo diferente ou sem código→ erro
+    // Corrigido: usar "code" ao invés de "oobCode"
     if (mode !== 'verifyEmail' || !code) {
       setStatus('error');
       return;
     }
 
-    // Caso válido, tentar aplicar o código
     const auth = getAuth();
     applyActionCode(auth, code)
       .then(() => setStatus('success'))
@@ -34,13 +32,18 @@ export default function VerifyEmailPage() {
 
   const renderContent = () => {
     if (status === 'loading') {
-      return <Spinner animation="border" />;
+      return (
+        <div className="text-center">
+          <Spinner animation="border" />
+          <p className="mt-2">Verificando e‑mail...</p>
+        </div>
+      );
     }
 
     if (status === 'prompt') {
       return (
         <Alert variant="info">
-          Verifique seu e‑mail!<br/>
+          Verifique seu e‑mail!<br />
           Enviamos um link de confirmação para o seu endereço.
         </Alert>
       );
@@ -49,24 +52,27 @@ export default function VerifyEmailPage() {
     if (status === 'success') {
       return (
         <Alert variant="success">
-          Seu e‑mail foi verificado com sucesso!<br/>
-          <Button onClick={() => navigate('/login')}>Ir para Login</Button>
+          Seu e‑mail foi verificado com sucesso!
+          <div className="text-center mt-3">
+            <Button onClick={() => navigate('/login')}>Ir para Login</Button>
+          </div>
         </Alert>
       );
     }
 
-    // status === 'error'
     return (
       <Alert variant="danger">
-        Falha na verificação. Link inválido ou expirado.<br/>
-        <Button onClick={() => navigate('/login')}>Ir para Login</Button>
+        Falha na verificação. Link inválido ou expirado.
+        <div className="text-center mt-3">
+          <Button onClick={() => navigate('/login')}>Ir para Login</Button>
+        </div>
       </Alert>
     );
   };
 
   return (
-    <Container className="d-flex vh-100">
-      <Card className="m-auto p-4" style={{ minWidth: '300px', maxWidth: '400px' }}>
+    <Container className="d-flex vh-100 align-items-center justify-content-center">
+      <Card className="p-4" style={{ minWidth: '300px', maxWidth: '400px' }}>
         <h5 className="text-center mb-3">Verificação de E‑mail</h5>
         {renderContent()}
       </Card>

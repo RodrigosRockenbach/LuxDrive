@@ -34,6 +34,11 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     setError('');
 
+    if (!code) {
+      setError('Código inválido. Recarregue o link de redefinição.');
+      return;
+    }
+
     if (newPassword.length < 6) {
       setError('A nova senha deve ter pelo menos 6 caracteres.');
       return;
@@ -61,6 +66,7 @@ export default function ResetPasswordPage() {
     return (
       <div className="text-center mt-5">
         <Spinner animation="border" />
+        <p className="mt-3">Carregando verificação...</p>
       </div>
     );
   }
@@ -70,7 +76,9 @@ export default function ResetPasswordPage() {
       <Container className="d-flex min-vh-100 align-items-center">
         <Card className="m-auto p-4">
           <Alert variant="danger">Link inválido ou expirado.</Alert>
-          <Button onClick={() => navigate('/login')}>Ir para Login</Button>
+          <div className="text-center mt-3">
+            <Button onClick={() => navigate('/login')}>Ir para Login</Button>
+          </div>
         </Card>
       </Container>
     );
@@ -83,7 +91,9 @@ export default function ResetPasswordPage() {
           <Alert variant="success">
             Sua senha foi redefinida com sucesso! Agora faça login.
           </Alert>
-          <Button onClick={() => navigate('/login')}>Ir para Login</Button>
+          <div className="text-center mt-3">
+            <Button onClick={() => navigate('/login')}>Ir para Login</Button>
+          </div>
         </Card>
       </Container>
     );
@@ -92,7 +102,9 @@ export default function ResetPasswordPage() {
   return (
     <Container className="d-flex min-vh-100 align-items-center">
       <Card className="m-auto p-4" style={{ maxWidth: '400px', width: '100%' }}>
-        <h5 className="mb-3">Redefinir senha para <strong>{email}</strong></h5>
+        <h5 className="mb-3">
+          Redefinir senha para <strong>{email}</strong>
+        </h5>
         {error && <Alert variant="danger">{error}</Alert>}
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
@@ -100,7 +112,7 @@ export default function ResetPasswordPage() {
             <Form.Control
               type="password"
               value={newPassword}
-              onChange={e => setNewPassword(e.target.value)}
+              onChange={(e) => setNewPassword(e.target.value)}
               required
             />
           </Form.Group>

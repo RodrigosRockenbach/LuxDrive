@@ -8,13 +8,11 @@ import {
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "../services/firebase";
 
-// Configurações para e-mail de verificação
 const verificationEmailSettings = {
-  url: `${window.location.origin}/login`,
+  url: `${window.location.origin}/verify-email`,
   handleCodeInApp: false
 };
 
-// Configurações para redefinição de senha
 const passwordResetSettings = {
   url: `${window.location.origin}/reset-password`,
   handleCodeInApp: false
