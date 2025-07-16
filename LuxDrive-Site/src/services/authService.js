@@ -1,4 +1,3 @@
-// src/services/authService.js
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -65,9 +64,12 @@ export async function logoutUser() {
 
 export async function requestPasswordReset(email) {
   try {
-    await sendPasswordResetEmail(auth, email, actionCodeSettings);
+    await sendPasswordResetEmail(auth, email, {
+      ...actionCodeSettings,
+      url: `${window.location.origin}/reset-password`,
+    });
   } catch (err) {
-    console.error("Erro ao solicitar reset de senha:", err);
-    throw new Error("Não foi possível enviar e‑mail de redefinição.");
+    console.error('Erro ao solicitar reset de senha:', err);
+    throw new Error('Não foi possível enviar e‑mail de redefinição.');
   }
 }
