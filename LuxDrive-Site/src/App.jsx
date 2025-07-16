@@ -20,7 +20,7 @@ import Dashboard from "./pages/Company/Dashboard";
 import CompanyAppointments from "./pages/Company/CompanyAppointments";
 import PerfilCompany from "./pages/Company/PerfilCompany";
 
-import AboutUs from "./pages/AboutUs";
+import AboutUs from "./pages/AboutUs.jsx";
 
 import UserLayout from "./layouts/UserLayout";
 import CompanyLayout from "./layouts/CompanyLayout";
@@ -50,6 +50,7 @@ function App() {
       <Route path="/verify-email" element={<VerifyEmailPage />} />
       <Route path="/company/login" element={<LoginCompany />} />
       <Route path="/company/register" element={<RegisterCompany />} />
+      <Route path="/sobre-nos" element={<AboutUs />} />
 
       {/* Rotas usuário */}
       <Route
@@ -64,7 +65,6 @@ function App() {
         <Route path="/meus-agendamentos" element={<AppointmentsUser />} />
         <Route path="/empresa/:id" element={<CompanyProfile />} />
         <Route path="/perfil" element={<UserProfile />} />
-        <Route path="/sobre-nos" element={<AboutUs />} />
       </Route>
 
       {/* Rotas empresa */}
@@ -78,7 +78,6 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/empresa/agendamentos" element={<CompanyAppointments />} />
         <Route path="/empresa/perfil" element={<PerfilCompany />} />
-        <Route path="/sobre-nos" element={<AboutUs />} />
       </Route>
 
       {/*Página de erro*/}
