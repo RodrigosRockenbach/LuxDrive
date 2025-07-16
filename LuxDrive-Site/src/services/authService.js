@@ -9,30 +9,22 @@ import {
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "../services/firebase";
 
-// Configurações usadas tanto na verificação de e‑mail quanto no reset de senha,
-// apontando para /verify-email e /login no seu domínio de produção.
 const actionCodeSettings = {
-  // Em produção: luxdrive-wash.vercel.app
   url: `${window.location.origin}/login`,
   handleCodeInApp: false
 };
 
-/**
- * Cria novo usuário, salva perfil no Firestore e envia e‑mail de verificação.
- */
 export async function registerUser(email, password, accountType, extraData = {}) {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // Grava dados da conta no Firestore
     await setDoc(doc(db, "users", user.uid), {
       type: accountType,
       email,
       ...extraData
     });
 
-    // Envia e‑mail de verificação apontando para /login
     await sendEmailVerification(user, actionCodeSettings);
     return userCredential;
 
@@ -47,9 +39,6 @@ export async function registerUser(email, password, accountType, extraData = {})
   }
 }
 
-/**
- * Faz login de um usuário existente.
- */
 export async function loginUser(email, password) {
   try {
     return await signInWithEmailAndPassword(auth, email, password);
@@ -66,9 +55,6 @@ export async function loginUser(email, password) {
   }
 }
 
-/**
- * Encerra a sessão do usuário atual.
- */
 export async function logoutUser() {
   try {
     await signOut(auth);
@@ -77,10 +63,6 @@ export async function logoutUser() {
   }
 }
 
-/**
- * Solicita envio de e‑mail para redefinição de senha.
- * O link recebido levará de volta para /login.
- */
 export async function requestPasswordReset(email) {
   try {
     await sendPasswordResetEmail(auth, email, actionCodeSettings);
