@@ -36,9 +36,8 @@ export default function LoginUser() {
         return;
       }
 
-      // Verifica se e-mail está confirmado
       if (!user.emailVerified) {
-        navigate('/verify-email');
+        setError('Verifique seu e‑mail antes de entrar no sistema.');
         setIsLoading(false);
         return;
       }
