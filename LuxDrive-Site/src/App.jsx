@@ -6,9 +6,8 @@ import LoginUser from "./pages/Auth/LoginUser";
 import RegisterUser from "./pages/Auth/RegisterUser";
 import LoginCompany from "./pages/Auth/LoginCompany";
 import RegisterCompany from "./pages/Auth/RegisterCompany";
-import VerifyEmailPage from "./pages/Auth/VerifyEmailPage";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
-import ResetPassword from "./pages/Auth/ResetPassword";  
+import AuthAction from "./pages/Auth/AuthAction";
 
 import Home from "./pages/User/home";
 import Schedule from "./pages/User/Schedule";
@@ -43,16 +42,16 @@ function App() {
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
 
+      {/* Público */}
       <Route path="/login" element={<LoginUser />} />
       <Route path="/cadastro" element={<RegisterUser />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} /> 
-      <Route path="/verify-email" element={<VerifyEmailPage />} />
+      <Route path="/auth-action" element={<AuthAction />} /> 
       <Route path="/company/login" element={<LoginCompany />} />
       <Route path="/company/register" element={<RegisterCompany />} />
       <Route path="/sobre-nos" element={<AboutUs />} />
 
-      {/* Rotas usuário */}
+      {/* Usuário */}
       <Route
         element={
           <PrivateRoute requiredType="user">
@@ -67,7 +66,7 @@ function App() {
         <Route path="/perfil" element={<UserProfile />} />
       </Route>
 
-      {/* Rotas empresa */}
+      {/* Empresa */}
       <Route
         element={
           <PrivateRoute requiredType="company">
@@ -80,7 +79,7 @@ function App() {
         <Route path="/empresa/perfil" element={<PerfilCompany />} />
       </Route>
 
-      {/*Página de erro*/}
+      {/* Página de erro */}
       <Route path="*" element={<ErrorPage />} />
     </Routes>
   );
