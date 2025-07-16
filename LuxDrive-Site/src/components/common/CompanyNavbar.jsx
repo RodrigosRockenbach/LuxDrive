@@ -8,7 +8,7 @@ export default function CompanyNavbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
   const closeSidebar = () => setIsSidebarOpen(false);
 
   const handleLogout = async () => {
@@ -33,10 +33,10 @@ export default function CompanyNavbar() {
           onClick={toggleSidebar}
           aria-label="Toggle navigation"
         >
-          <span className="navbar-toggler-icon"></span>
+          <span className="navbar-toggler-icon" />
         </button>
 
-        {/* Menu desktop */}
+        {/* Desktop menu */}
         <div className="collapse navbar-collapse d-none d-lg-flex justify-content-end">
           <ul className="navbar-nav align-items-center">
             <li className="nav-item">
@@ -53,7 +53,7 @@ export default function CompanyNavbar() {
             </li>
             <li className="nav-item ms-3">
               <button
-                className="nav-link bg-transparent border-0"
+                className="nav-link btn btn-link"
                 onClick={handleLogout}
               >
                 Sair
@@ -62,7 +62,7 @@ export default function CompanyNavbar() {
           </ul>
         </div>
 
-        {/* mobile */}
+        {/* Mobile sidebar */}
         {isSidebarOpen && (
           <div className="sidebar-overlay" onClick={closeSidebar}>
             <div className="sidebar" onClick={e => e.stopPropagation()}>
@@ -70,7 +70,7 @@ export default function CompanyNavbar() {
                 className="btn-close mb-3"
                 onClick={closeSidebar}
                 aria-label="Fechar menu"
-              ></button>
+              />
               <div className="sidebar-item">
                 <Link to="/dashboard" onClick={closeSidebar}>Início</Link>
               </div>

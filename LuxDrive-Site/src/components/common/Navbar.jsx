@@ -45,10 +45,10 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     await signOut(auth);
-    navigate('/login');
+    navigate('/login', { replace: true });
   };
 
-  const toggleMenu = () => setIsOpen(!isOpen);
+  const toggleMenu = () => setIsOpen(prev => !prev);
   const closeMenu = () => setIsOpen(false);
 
   return (
@@ -135,9 +135,6 @@ export default function Navbar() {
               </li>
               <li className="list-group-item sidebar-item">
                 <Link to="/sobre-nos" onClick={() => setShowSidebar(false)}>Sobre nós</Link>
-              </li>
-              <li className="list-group-item sidebar-item">
-                <Link to="/company/register" onClick={() => setShowSidebar(false)}>Trabalhe Conosco</Link>
               </li>
               <li
                 className="list-group-item sidebar-item text-danger"
