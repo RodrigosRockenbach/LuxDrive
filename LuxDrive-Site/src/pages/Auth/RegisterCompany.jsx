@@ -29,11 +29,10 @@ export default function RegisterCompany() {
     return () => document.body.classList.remove('auth-page');
   }, []);
 
-  // Validação de CNPJ
   const validateCNPJ = (cnpj) => {
     const cleaned = cnpj.replace(/\D/g, '');
     if (cleaned.length !== 14) return false;
-    // Elimina CNPJs inválidos (todos dígitos iguais)
+
     if (/^(\d)\1+$/.test(cleaned)) return false;
     const calcCheckDigit = (numbers) => {
       let sum = 0;
@@ -56,7 +55,7 @@ export default function RegisterCompany() {
 
   const handleNextStep = (e) => {
     e.preventDefault();
-    // Validação etapa 1
+
     if (!name || !email || !password || !confirmPassword) {
       setError('Preencha todos os campos obrigatórios.');
       return;
@@ -107,8 +106,8 @@ export default function RegisterCompany() {
         ...(cnpj && { cnpj }),
         endereco: { cep, rua, numero, bairro, cidade, estado }
       });
-      // Após cadastro, mandar para verificação de e-mail
-      navigate('/verify-email');
+
+      navigate('/company/login');
     } catch (err) {
       setError(err.message || 'Erro ao registrar a empresa.');
     } finally {

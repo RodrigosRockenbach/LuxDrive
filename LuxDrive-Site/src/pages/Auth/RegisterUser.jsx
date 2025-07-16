@@ -32,8 +32,7 @@ export default function RegisterUser() {
 
     try {
       await registerUser(email, password, 'user', { name });
-      // após registro, ir para página de verificação de e-mail
-      navigate('/verify-email');
+      navigate('/login');
     } catch (err) {
       console.error('Erro ao criar conta:', err);
       setError(err.message || 'Erro ao criar conta. Tente novamente.');
