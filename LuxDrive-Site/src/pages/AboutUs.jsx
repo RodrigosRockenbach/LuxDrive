@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
-import logo from '../../assets/images/LogoAzul.png';
+import logo from '../assets/images/LogoAzul.png';
 import '../styles/AboutUs.css';
 
 export default function AboutUs() {
