@@ -35,7 +35,7 @@ export default function AuthAction() {
     try {
       await confirmPasswordReset(auth, oobCode, newPassword);
       setSuccessMessage('Senha redefinida com sucesso! Redirecionando...');
-      setTimeout(() => navigate('/login-user'), 3000);
+      setTimeout(() => navigate('/login'), 3000);
     } catch (err) {
       setError('Erro ao redefinir senha.');
     }
@@ -45,7 +45,7 @@ export default function AuthAction() {
     try {
       await applyActionCode(auth, oobCode);
       setSuccessMessage('E‑mail verificado com sucesso! Redirecionando...');
-      setTimeout(() => navigate('/login-user'), 3000);
+      setTimeout(() => navigate('/login'), 3000);
     } catch (err) {
       setError('O link de verificação é inválido ou expirou.');
     }
