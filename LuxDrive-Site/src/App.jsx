@@ -8,7 +8,7 @@ import LoginCompany from "./pages/Auth/LoginCompany";
 import RegisterCompany from "./pages/Auth/RegisterCompany";
 import VerifyEmailPage from "./pages/Auth/VerifyEmailPage";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
-import ResetPassword from "./pages/Auth/ResetPassword.jsx";  
+import ResetPassword from "./pages/Auth/ResetPasswordPage.jsx";  
 
 import Home from "./pages/User/home";
 import Schedule from "./pages/User/Schedule";

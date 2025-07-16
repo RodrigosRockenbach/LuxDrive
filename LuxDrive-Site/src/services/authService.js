@@ -8,8 +8,15 @@ import {
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "../services/firebase";
 
-const actionCodeSettings = {
+// Configurações para e-mail de verificação
+const verificationEmailSettings = {
   url: `${window.location.origin}/login`,
+  handleCodeInApp: false
+};
+
+// Configurações para redefinição de senha
+const passwordResetSettings = {
+  url: `${window.location.origin}/reset-password`,
   handleCodeInApp: false
 };
 
@@ -24,7 +31,7 @@ export async function registerUser(email, password, accountType, extraData = {})
       ...extraData
     });
 
-    await sendEmailVerification(user, actionCodeSettings);
+    await sendEmailVerification(user, verificationEmailSettings);
     return userCredential;
 
   } catch (err) {
@@ -64,10 +71,7 @@ export async function logoutUser() {
 
 export async function requestPasswordReset(email) {
   try {
-    await sendPasswordResetEmail(auth, email, {
-      ...actionCodeSettings,
-      url: window.location.origin + '/reset-password'
-    });
+    await sendPasswordResetEmail(auth, email, passwordResetSettings);
   } catch (err) {
     console.error('Erro ao solicitar reset de senha:', err);
     throw new Error('Não foi possível enviar e‑mail de redefinição.');
