@@ -66,7 +66,7 @@ export async function requestPasswordReset(email) {
   try {
     await sendPasswordResetEmail(auth, email, {
       ...actionCodeSettings,
-      url: `${window.location.origin}/reset-password`,
+      url: window.location.origin + '/reset-password'
     });
   } catch (err) {
     console.error('Erro ao solicitar reset de senha:', err);
