@@ -78,7 +78,7 @@ export default function Navbar() {
                 <Link className="nav-link" to="/meus-agendamentos" onClick={closeMenu}>Agendamentos</Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/erro" onClick={closeMenu}>Sobre nós</Link>
+                <Link className="nav-link" to="/sobre-nos" onClick={closeMenu}>Sobre nós</Link>
               </li>
             </ul>
 
@@ -134,7 +134,7 @@ export default function Navbar() {
                 <Link to="/perfil" onClick={() => setShowSidebar(false)}>Perfil</Link>
               </li>
               <li className="list-group-item sidebar-item">
-                <Link to="/erro" onClick={() => setShowSidebar(false)}>Sobre nós</Link>
+                <Link to="/sobre-nos" onClick={() => setShowSidebar(false)}>Sobre nós</Link>
               </li>
               <li className="list-group-item sidebar-item">
                 <Link to="/company/register" onClick={() => setShowSidebar(false)}>Trabalhe Conosco</Link>

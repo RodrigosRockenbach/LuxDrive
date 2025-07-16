@@ -20,6 +20,8 @@ import Dashboard from "./pages/Company/Dashboard";
 import CompanyAppointments from "./pages/Company/CompanyAppointments";
 import PerfilCompany from "./pages/Company/PerfilCompany";
 
+import AboutUs from "./pages/AboutUs";
+
 import UserLayout from "./layouts/UserLayout";
 import CompanyLayout from "./layouts/CompanyLayout";
 
@@ -39,10 +41,8 @@ function App() {
 
   return (
     <Routes>
-      {/* Rota raiz: redireciona para login de usuário */}
       <Route path="/" element={<Navigate to="/login" replace />} />
 
-      {/* Rotas públicas */}
       <Route path="/login" element={<LoginUser />} />
       <Route path="/cadastro" element={<RegisterUser />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -51,7 +51,7 @@ function App() {
       <Route path="/company/login" element={<LoginCompany />} />
       <Route path="/company/register" element={<RegisterCompany />} />
 
-      {/* Rotas protegidas — usuário */}
+      {/* Rotas usuário */}
       <Route
         element={
           <PrivateRoute requiredType="user">
@@ -64,9 +64,10 @@ function App() {
         <Route path="/meus-agendamentos" element={<AppointmentsUser />} />
         <Route path="/empresa/:id" element={<CompanyProfile />} />
         <Route path="/perfil" element={<UserProfile />} />
+        <Route path="/sobre-nos" element={<AboutUs />} />
       </Route>
 
-      {/* Rotas protegidas — empresa */}
+      {/* Rotas empresa */}
       <Route
         element={
           <PrivateRoute requiredType="company">
@@ -77,9 +78,10 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/empresa/agendamentos" element={<CompanyAppointments />} />
         <Route path="/empresa/perfil" element={<PerfilCompany />} />
+        <Route path="/sobre-nos" element={<AboutUs />} />
       </Route>
 
-      {/* Página de erro para qualquer outra rota */}
+      {/*Página de erro*/}
       <Route path="*" element={<ErrorPage />} />
     </Routes>
   );

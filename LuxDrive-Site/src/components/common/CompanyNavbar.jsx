@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import LogoBranco from '../../assets/images/LogoBranco.png';
-import { logoutUser } from '../../services/authService'; // import do serviço de logout
+import { logoutUser } from '../../services/authService';
 import '../../styles/Navbar.css';
 
 export default function CompanyNavbar() {
@@ -17,7 +17,6 @@ export default function CompanyNavbar() {
       navigate('/company/login', { replace: true });
     } catch (err) {
       console.error('Erro ao sair:', err);
-      // opcional: exibir toast/alert de erro
     }
   };
 
@@ -44,7 +43,7 @@ export default function CompanyNavbar() {
               <Link to="/dashboard" className="nav-link">Início</Link>
             </li>
             <li className="nav-item ms-3">
-              <Link to="#" className="nav-link">Sobre nós</Link>
+              <Link to="/sobre-nos" className="nav-link">Sobre nós</Link>
             </li>
             <li className="nav-item ms-3">
               <Link to="/empresa/agendamentos" className="nav-link">Agenda</Link>
@@ -63,7 +62,7 @@ export default function CompanyNavbar() {
           </ul>
         </div>
 
-        {/* Sidebar mobile */}
+        {/* mobile */}
         {isSidebarOpen && (
           <div className="sidebar-overlay" onClick={closeSidebar}>
             <div className="sidebar" onClick={e => e.stopPropagation()}>
@@ -76,7 +75,7 @@ export default function CompanyNavbar() {
                 <Link to="/dashboard" onClick={closeSidebar}>Início</Link>
               </div>
               <div className="sidebar-item">
-                <Link to="#" onClick={closeSidebar}>Sobre nós</Link>
+                <Link to="/sobre-nos" onClick={closeSidebar}>Sobre nós</Link>
               </div>
               <div className="sidebar-item">
                 <Link to="/empresa/agendamentos" onClick={closeSidebar}>Agenda</Link>
