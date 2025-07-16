@@ -1,45 +1,74 @@
-// src/pages/Auth/VerifyEmailPage.jsx
-import { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { applyActionCode } from 'firebase/auth';
-import { auth } from '../../services/firebase';
+import React, { useEffect, useState } from 'react';
+import { getAuth, applyActionCode } from 'firebase/auth';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function VerifyEmailPage() {
-  const [message, setMessage] = useState('Validando...');
-  const [searchParams] = useSearchParams();
+  const auth = getAuth();
   const navigate = useNavigate();
+  const { search } = useLocation();
+  const [status, setStatus] = useState({
+    loading: true,
+    success: false,
+    message: '',
+  });
 
   useEffect(() => {
-    const mode = searchParams.get('mode');
-    const oobCode = searchParams.get('oobCode');
+    const params = new URLSearchParams(search);
+    const oobCode = params.get('oobCode');
+    const mode = params.get('mode');
 
     if (mode !== 'verifyEmail' || !oobCode) {
-      setMessage('Link de verificação inválido.');
+      setStatus({
+        loading: false,
+        success: false,
+        message: 'Link inválido ou incompleto.',
+      });
       return;
     }
 
     applyActionCode(auth, oobCode)
       .then(() => {
-        setMessage('E‑mail verificado com sucesso! Você já pode fazer login.');
+        setStatus({
+          loading: false,
+          success: true,
+          message: 'E‑mail verificado com sucesso! Você já pode fazer login.',
+        });
       })
       .catch((error) => {
-        console.error('Erro applyActionCode:', error);
-        setMessage('Não foi possível verificar seu e‑mail. O link pode estar expirado.');
+        console.error('Erro ao aplicar o código:', error);
+        setStatus({
+          loading: false,
+          success: false,
+          message:
+            'Não foi possível verificar o e‑mail (talvez o link tenha expirado).',
+        });
       });
-  }, [searchParams]);
+  }, [search, auth]);
+
+  const handleGoLogin = () => {
+    navigate('/login');
+  };
 
   return (
-    <div className="vh-100 d-flex justify-content-center align-items-center bg-primary">
-      <div className="card shadow" style={{ maxWidth: 400, width: '90%' }}>
+    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '80vh', padding: '1rem' }}>
+      <div className="card shadow-sm" style={{ maxWidth: '400px', width: '100%' }}>
         <div className="card-body text-center">
-          <h5 className="card-title mb-3">Verificação de E‑mail</h5>
-          <p className="card-text">{message}</p>
-          <button
-            className="btn btn-primary"
-            onClick={() => navigate('/login')}
-          >
-            Ir para Login
-          </button>
+          {status.loading ? (
+            <>
+              <div className="spinner-border mb-3" role="status" />
+              <p>Verificando seu e‑mail...</p>
+            </>
+          ) : (
+            <>
+              <h5 className={`card-title ${status.success ? 'text-success' : 'text-danger'}`}>
+                {status.success ? 'Verificação concluída' : 'Falha na verificação'}
+              </h5>
+              <p className="card-text">{status.message}</p>
+              <button className="btn btn-primary" onClick={handleGoLogin}>
+                Ir para Login
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
