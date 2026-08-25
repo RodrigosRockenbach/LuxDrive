@@ -1,0 +1,16 @@
+.lux-footer {
+    background-color: var(--color-bg);
+    width: 100%;
+    font-size: 0.85rem;
+  }
+  
+  .footer-logo {
+    height: 120px;
+    width: auto;
+  }
+  
+  .linhaFooter {
+    border-color: var(--color-border);
+    width: 90%;
+    margin: 0 auto 0.5rem auto;
+  }

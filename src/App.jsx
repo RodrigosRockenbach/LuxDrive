@@ -2,31 +2,31 @@ import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
 
-import LoginUser from "./pages/Auth/LoginUser";
-import RegisterUser from "./pages/Auth/RegisterUser";
-import LoginCompany from "./pages/Auth/LoginCompany";
-import RegisterCompany from "./pages/Auth/RegisterCompany";
-import ForgotPassword from "./pages/Auth/ForgotPassword";
-import AuthAction from "./pages/Auth/AuthAction";
+import LoginUser from "./pages/Auth/LoginUser/LoginUser";
+import RegisterUser from "./pages/Auth/RegisterUser/RegisterUser";
+import LoginCompany from "./pages/Auth/LoginCompany/LoginCompany";
+import RegisterCompany from "./pages/Auth/RegisterCompany/RegisterCompany";
+import ForgotPassword from "./pages/Auth/ForgotPassword/ForgotPassword";
+import AuthAction from "./pages/Auth/AuthAction/AuthAction";
 
-import Home from "./pages/User/home";
-import Schedule from "./pages/User/Schedule";
-import AppointmentsUser from "./pages/User/UserAppointments";
-import UserProfile from "./pages/User/UserProfile";
-import CompanyProfile from "./pages/CompanyProfile";
+import Home from "./pages/User/Home/Home";
+import Schedule from "./pages/User/Schedule/Schedule";
+import AppointmentsUser from "./pages/User/UserAppointments/UserAppointments";
+import UserProfile from "./pages/User/UserProfile/UserProfile";
+import CompanyProfile from "./pages/Company/CompanyProfile/CompanyProfile";
 
-import Dashboard from "./pages/Company/Dashboard";
-import CompanyAppointments from "./pages/Company/CompanyAppointments";
-import PerfilCompany from "./pages/Company/PerfilCompany";
+import Dashboard from "./pages/Company/Dashboard/Dashboard";
+import CompanyAppointments from "./pages/Company/CompanyAppointments/CompanyAppointments";
+import PerfilCompany from "./pages/Company/CompanySettings/CompanySettings";
 
-import AboutUs from "./pages/AboutUs.jsx";
+import AboutUs from "./pages/AboutUs/AboutUs";
 
-import UserLayout from "./layouts/UserLayout";
-import CompanyLayout from "./layouts/CompanyLayout";
+import UserLayout from "./layouts/UserLayout/UserLayout";
+import CompanyLayout from "./layouts/CompanyLayout/CompanyLayout";
 
 import PrivateRoute from "./components/common/PrivateRoute";
 import Loading from "./components/common/Loading";
-import ErrorPage from "./pages/ErrorPage";
+import ErrorPage from "./pages/ErrorPage/ErrorPage";
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);

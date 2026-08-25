@@ -6,7 +6,7 @@ import {
   sendPasswordResetEmail
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-import { auth, db } from "../services/firebase";
+import { auth, db } from "./firebase";
 
 const actionCodeSettings = {
   url: `${window.location.origin}/auth-action`,

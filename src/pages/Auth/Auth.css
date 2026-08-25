@@ -1,0 +1,49 @@
+/* ===== Usuário: Login e Cadastro ===== */
+.register-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .register-page .container {
+    max-width: 900px;
+    background-color: var(--color-bg);
+    border-radius: var(--radius-card);
+    padding: 2rem;
+    margin: auto;
+  }
+  
+  /* ===== Empresa: Login ===== */
+  .login-company-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-primary);
+  }
+  
+  .login-company-page .container {
+    background-color: var(--color-bg) !important;
+    border-radius: var(--radius-card);
+  }
+  
+  /* ===== Empresa: Cadastro ===== */
+  .register-company-page .container {
+    background-color: var(--color-bg);
+    border-radius: var(--radius-card);
+    max-width: 600px;
+  }
+  
+  .form-control-plaintext {
+    border: none;
+    border-bottom: 2px solid #ccc;
+    border-radius: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  
+  .form-control-plaintext:focus {
+    box-shadow: none;
+    border-bottom-color: var(--color-primary);
+  }

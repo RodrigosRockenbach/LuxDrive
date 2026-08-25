@@ -5,34 +5,48 @@
 
   color-scheme: light dark;
   color: #213547;
-  background-color: #F9F9F9;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* === Design tokens LuxDrive === */
+  --color-primary: #3437C9;
+  --color-primary-hover: #2d30b2;
+  --color-bg: #F9F9F9;
+  --color-text: #213547;
+  --color-border: #4D4D50;
+  --color-white: #ffffff;
+
+  --radius-pill: 20px;
+  --radius-card: 1rem;
+
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 2rem;
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #F9F9F9;
+  background-color: var(--color-bg);
 }
 
 body.auth-page {
-  background-color: #3437C9 !important;
+  background-color: var(--color-primary) !important;
 }
 
 /* Links */
 a {
   font-weight: 500;
-  color: #3437C9;
+  color: var(--color-primary);
   text-decoration: none;
 }
 
 a:hover {
-  color: #2d30b2;
+  color: var(--color-primary-hover);
 }
 
 button {
@@ -42,10 +56,31 @@ button {
   transition: background-color 0.2s ease-in-out;
 }
 
-.lux-navbar {
-  background-color: #3437C9 !important;
+/* Botão principal do sistema (login, cadastro, etc.) */
+.botao,
+.botaoEntrar,
+.botaoCadastrar {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  padding: 10px;
+  font-weight: bold;
+  border-radius: var(--radius-pill);
+  transition: background-color 0.3s ease;
 }
 
-.sidebar-item:hover {
-  color: #3437C9;
+.botao {
+  width: 100%;
+}
+
+.botao:hover,
+.botaoEntrar:hover,
+.botaoCadastrar:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* persona usada em várias telas exem.(perfil, empresa, navbar) */
+.avatar-circle {
+  border-radius: 50%;
+  object-fit: cover;
 }
